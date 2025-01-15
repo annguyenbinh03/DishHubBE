@@ -5,6 +5,10 @@ VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Group6.NET1704.SW392.AIDiner.DAL", "Group6.NET1704.SW392.AIDiner.DAL\Group6.NET1704.SW392.AIDiner.DAL.csproj", "{3F2B5645-FBF9-4C85-9EB7-D96D3517B8EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Group6.NET1704.SW392.AIDiner.Services", "Group6.NET1704.SW392.AIDiner.Services\Group6.NET1704.SW392.AIDiner.Services.csproj", "{58A47BEC-6E92-4B49-B53C-BA4AECFEB568}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Group6.NET1704.SW392.AIDiner.API", "Group6.NET1704.SW392.AIDiner.API\Group6.NET1704.SW392.AIDiner.API.csproj", "{CE085927-77C4-46AF-80A0-0B74630ED67E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{3F2B5645-FBF9-4C85-9EB7-D96D3517B8EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F2B5645-FBF9-4C85-9EB7-D96D3517B8EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F2B5645-FBF9-4C85-9EB7-D96D3517B8EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58A47BEC-6E92-4B49-B53C-BA4AECFEB568}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58A47BEC-6E92-4B49-B53C-BA4AECFEB568}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58A47BEC-6E92-4B49-B53C-BA4AECFEB568}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58A47BEC-6E92-4B49-B53C-BA4AECFEB568}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE085927-77C4-46AF-80A0-0B74630ED67E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE085927-77C4-46AF-80A0-0B74630ED67E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE085927-77C4-46AF-80A0-0B74630ED67E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE085927-77C4-46AF-80A0-0B74630ED67E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
