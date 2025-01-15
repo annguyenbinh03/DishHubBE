@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35303.130
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Group6.NET1704.SW392.AIDiner.DAL", "Group6.NET1704.SW392.AIDiner.DAL\Group6.NET1704.SW392.AIDiner.DAL.csproj", "{3F2B5645-FBF9-4C85-9EB7-D96D3517B8EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3F2B5645-FBF9-4C85-9EB7-D96D3517B8EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F2B5645-FBF9-4C85-9EB7-D96D3517B8EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F2B5645-FBF9-4C85-9EB7-D96D3517B8EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F2B5645-FBF9-4C85-9EB7-D96D3517B8EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {957ACACD-BC1D-4D74-9606-4FCD12A1B6A7}
+	EndGlobalSection
+EndGlobal
