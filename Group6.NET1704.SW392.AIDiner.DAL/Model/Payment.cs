@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,8 +14,11 @@ namespace Group6.NET1704.SW392.AIDiner.DAL
     {
         [Key]
         public Guid PaymentID { get; set; }
+        public Guid PaymentMethodID { get; set; }
+        [ForeignKey(nameof(PaymentMethodID))]
+        public PaymentMethod? PaymentMethod { get; set; }
         public string? PaymentCode { get; set; }
-        public DateTime CreateDate { get; set; }
+        public DateTime CreateAt { get; set; }
         public decimal Amount { get; set; }
         public string? Description { get; set; }
         public bool Status { get; set; }

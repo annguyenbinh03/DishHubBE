@@ -15,5 +15,6 @@ namespace Group6.NET1704.SW392.AIDiner.DAL
         public Guid CategoryID { get; set; }
         public string? CategoryName { get; set; }
         public bool Status { get; set; }
+        public string? Image {  get; set; }
     }
 }

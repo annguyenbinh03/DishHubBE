@@ -14,6 +14,6 @@ namespace Group6.NET1704.SW392.AIDiner.DAL
         [Key]
         public Guid IngredientID { get; set; }
         public string? IngredientName { get; set; }
-        public Guid Quantity { get; set; }
+        public Guid Image { get; set; }
     }
 }

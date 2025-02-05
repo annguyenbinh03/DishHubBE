@@ -20,7 +20,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL
         public Guid MenuID { get; set; }
         [ForeignKey(nameof(MenuID))]
 
-        public Menu? Menu { get; set; }
+        public Table? Menu { get; set; }
 
         public Guid CategoryID { get; set; }
         [ForeignKey(nameof(CategoryID))]    

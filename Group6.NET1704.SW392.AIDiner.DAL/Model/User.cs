@@ -23,7 +23,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL
         [ForeignKey(nameof(RoleID))]    
 
         public UserRole? UserRole { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedAt { get; set; }
         public string? Address { get; set; }
         public bool Status { get; set; }
 

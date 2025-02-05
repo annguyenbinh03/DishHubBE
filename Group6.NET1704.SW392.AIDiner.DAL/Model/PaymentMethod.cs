@@ -8,17 +8,14 @@ using System.Threading.Tasks;
 
 namespace Group6.NET1704.SW392.AIDiner.DAL
 {
-    [Table("Maintenance")]
-    public class Maintenance
+    [Table("PaymentMethod")]
+    public class PaymentMethod
     {
         [Key] 
-        public Guid MaintenanceID { get; set; }
-        public DateTime Date { get; set; }
-        public string? Technician { get; set; }
+        public Guid PaymentMethodID { get; set; }
+        public string? PaymentMethodName { get; set; }
         public string? Description { get; set; }
+        public bool Status { get; set; }
 
-        public Guid ChatbotID { get; set; }
-        [ForeignKey(nameof(ChatbotID))]
-        public ChatbotAI? ChatbotAI { get; set; }
     }
 }

@@ -31,39 +31,15 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                     b.Property<string>("CategoryName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
                     b.HasKey("CategoryID");
 
                     b.ToTable("Category");
-                });
-
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.ChatbotAI", b =>
-                {
-                    b.Property<Guid>("ChatbotID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DishID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("UserID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Version")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ChatbotID");
-
-                    b.HasIndex("DishID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("ChatbotAI");
                 });
 
             modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Dish", b =>
@@ -96,45 +72,25 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                     b.ToTable("Dish");
                 });
 
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.FavoriteRecipe", b =>
+            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.DishIngredient", b =>
                 {
-                    b.Property<Guid>("FavoriteRecipeID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DishID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("FavoriteRecipeID");
-
-                    b.ToTable("FavoriteRecipe");
-                });
-
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Feedback", b =>
-                {
-                    b.Property<Guid>("FeedbackID")
+                    b.Property<Guid>("DishIngredientID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid>("DishID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Rating")
+                    b.Property<Guid>("IngredientID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("FeedbackID");
+                    b.HasKey("DishIngredientID");
 
                     b.HasIndex("DishID");
 
-                    b.ToTable("Feedback");
+                    b.HasIndex("IngredientID");
+
+                    b.ToTable("DishIngredient");
                 });
 
             modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Ingredient", b =>
@@ -143,57 +99,15 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("Image")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("IngredientName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("Quantity")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("IngredientID");
 
                     b.ToTable("Ingredient");
-                });
-
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Maintenance", b =>
-                {
-                    b.Property<Guid>("MaintenanceID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ChatbotID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Technician")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MaintenanceID");
-
-                    b.HasIndex("ChatbotID");
-
-                    b.ToTable("Maintenance");
-                });
-
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Menu", b =>
-                {
-                    b.Property<Guid>("MenuID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MenuName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MenuID");
-
-                    b.ToTable("Menu");
                 });
 
             modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Order", b =>
@@ -202,10 +116,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("OrderDate")
+                    b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentStatus")
@@ -214,10 +125,15 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("TableID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("OrderID");
+
+                    b.HasIndex("TableID");
 
                     b.ToTable("Order");
                 });
@@ -258,7 +174,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("CreateDate")
+                    b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -270,6 +186,9 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                     b.Property<string>("PaymentCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("PaymentMethodID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
@@ -277,28 +196,96 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
 
                     b.HasIndex("OrderID");
 
+                    b.HasIndex("PaymentMethodID");
+
                     b.ToTable("Payment");
                 });
 
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Recipe", b =>
+            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.PaymentMethod", b =>
                 {
-                    b.Property<Guid>("RecipeID")
+                    b.Property<Guid>("PaymentMethodID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("IngredientID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("RecipeName")
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserID")
+                    b.Property<string>("PaymentMethodName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("PaymentMethodID");
+
+                    b.ToTable("PaymentMethod");
+                });
+
+            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Request", b =>
+                {
+                    b.Property<Guid>("RequestID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("RecipeID");
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
 
-                    b.HasIndex("UserID");
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Recipe");
+                    b.Property<Guid>("OrderID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ProcessAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("RequestTypeID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("RequestID");
+
+                    b.HasIndex("OrderID");
+
+                    b.HasIndex("RequestTypeID");
+
+                    b.ToTable("Request");
+                });
+
+            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.RequestType", b =>
+                {
+                    b.Property<Guid>("RequestTypeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RequestTypeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RequestTypeID");
+
+                    b.ToTable("RequestType");
+                });
+
+            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Table", b =>
+                {
+                    b.Property<Guid>("TableID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QRCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TableName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TableID");
+
+                    b.ToTable("Table");
                 });
 
             modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.User", b =>
@@ -310,7 +297,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateOfBirth")
@@ -358,23 +345,25 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                     b.ToTable("UserRole");
                 });
 
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.ChatbotAI", b =>
+            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.WishList", b =>
                 {
-                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.Dish", "Dish")
-                        .WithMany()
-                        .HasForeignKey("DishID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("WishListID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("DishID")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Navigation("Dish");
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Navigation("User");
+                    b.HasKey("WishListID");
+
+                    b.HasIndex("DishID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("WishList");
                 });
 
             modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Dish", b =>
@@ -385,7 +374,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.Menu", "Menu")
+                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.Table", "Menu")
                         .WithMany()
                         .HasForeignKey("MenuID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -396,18 +385,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                     b.Navigation("Menu");
                 });
 
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.FavoriteRecipe", b =>
-                {
-                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.Dish", "Dish")
-                        .WithMany()
-                        .HasForeignKey("FavoriteRecipeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Dish");
-                });
-
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Feedback", b =>
+            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.DishIngredient", b =>
                 {
                     b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.Dish", "Dish")
                         .WithMany()
@@ -415,18 +393,26 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Dish");
-                });
-
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Maintenance", b =>
-                {
-                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.ChatbotAI", "ChatbotAI")
+                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.Ingredient", "Ingredient")
                         .WithMany()
-                        .HasForeignKey("ChatbotID")
+                        .HasForeignKey("IngredientID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ChatbotAI");
+                    b.Navigation("Dish");
+
+                    b.Navigation("Ingredient");
+                });
+
+            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Order", b =>
+                {
+                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.Table", "Table")
+                        .WithMany()
+                        .HasForeignKey("TableID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Table");
                 });
 
             modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.OrderDetail", b =>
@@ -456,26 +442,34 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.PaymentMethod", "PaymentMethod")
+                        .WithMany()
+                        .HasForeignKey("PaymentMethodID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Order");
+
+                    b.Navigation("PaymentMethod");
                 });
 
-            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Recipe", b =>
+            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.Request", b =>
                 {
-                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.Ingredient", "Ingredient")
+                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.Order", "Order")
                         .WithMany()
-                        .HasForeignKey("RecipeID")
+                        .HasForeignKey("OrderID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.User", "User")
+                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.RequestType", "RequestType")
                         .WithMany()
-                        .HasForeignKey("UserID")
+                        .HasForeignKey("RequestTypeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Ingredient");
+                    b.Navigation("Order");
 
-                    b.Navigation("User");
+                    b.Navigation("RequestType");
                 });
 
             modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.User", b =>
@@ -487,6 +481,25 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("Group6.NET1704.SW392.AIDiner.DAL.WishList", b =>
+                {
+                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.Dish", "Dish")
+                        .WithMany()
+                        .HasForeignKey("DishID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Group6.NET1704.SW392.AIDiner.DAL.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dish");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

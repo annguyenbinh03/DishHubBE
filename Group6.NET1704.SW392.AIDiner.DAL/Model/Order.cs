@@ -13,10 +13,12 @@ namespace Group6.NET1704.SW392.AIDiner.DAL
     {
         [Key]
         public Guid OrderID { get; set; }
-        public DateTime OrderDate { get; set; }
+        public Guid TableID { get; set; }
+        [ForeignKey(nameof(TableID))]
+        public Table? Table { get; set; }
         public decimal TotalAmount { get; set; }
         public string? PaymentStatus { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreateAt { get; set; }
         public bool Status { get; set; }
     }
 }

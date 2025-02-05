@@ -8,14 +8,19 @@ using System.Threading.Tasks;
 
 namespace Group6.NET1704.SW392.AIDiner.DAL
 {
-    [Table("FavoriteRecipe")]
-    public class FavoriteRecipe
+    [Table("WishList")]
+    public class WishList
     {
         [Key]
-        public Guid FavoriteRecipeID { get; set; }
+        public Guid WishListID { get; set; }
         public Guid DishID { get; set; }
-        [ForeignKey(nameof(FavoriteRecipeID))]
+        [ForeignKey(nameof(DishID))]
 
         public Dish? Dish { get; set; }
+        public Guid UserID { get; set; }
+        [ForeignKey(nameof(UserID))]
+
+        public User? User { get; set; }
+
     }
 }

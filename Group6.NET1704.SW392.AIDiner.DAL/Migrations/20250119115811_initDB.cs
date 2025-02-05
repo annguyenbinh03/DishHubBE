@@ -15,7 +15,8 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                 {
                     CategoryID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: false)
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -28,7 +29,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                 {
                     IngredientID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IngredientName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Quantity = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Image = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -36,32 +37,44 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Menu",
+                name: "PaymentMethod",
                 columns: table => new
                 {
-                    MenuID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MenuName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Menu", x => x.MenuID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Order",
-                columns: table => new
-                {
-                    OrderID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaymentMethodID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PaymentMethodName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Order", x => x.OrderID);
+                    table.PrimaryKey("PK_PaymentMethod", x => x.PaymentMethodID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RequestType",
+                columns: table => new
+                {
+                    RequestTypeID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RequestTypeName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RequestType", x => x.RequestTypeID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Table",
+                columns: table => new
+                {
+                    TableID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TableName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    QRCode = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Table", x => x.TableID);
                 });
 
             migrationBuilder.CreateTable(
@@ -97,33 +110,32 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                         principalColumn: "CategoryID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Dish_Menu_MenuID",
+                        name: "FK_Dish_Table_MenuID",
                         column: x => x.MenuID,
-                        principalTable: "Menu",
-                        principalColumn: "MenuID",
+                        principalTable: "Table",
+                        principalColumn: "TableID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Payment",
+                name: "Order",
                 columns: table => new
                 {
-                    PaymentID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PaymentCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: false),
-                    OrderID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    OrderID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TableID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payment", x => x.PaymentID);
+                    table.PrimaryKey("PK_Order", x => x.OrderID);
                     table.ForeignKey(
-                        name: "FK_Payment_Order_OrderID",
-                        column: x => x.OrderID,
-                        principalTable: "Order",
-                        principalColumn: "OrderID",
+                        name: "FK_Order_Table_TableID",
+                        column: x => x.TableID,
+                        principalTable: "Table",
+                        principalColumn: "TableID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -139,7 +151,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RoleID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -155,42 +167,27 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FavoriteRecipe",
+                name: "DishIngredient",
                 columns: table => new
                 {
-                    FavoriteRecipeID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DishIngredientID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IngredientID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DishID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FavoriteRecipe", x => x.FavoriteRecipeID);
+                    table.PrimaryKey("PK_DishIngredient", x => x.DishIngredientID);
                     table.ForeignKey(
-                        name: "FK_FavoriteRecipe_Dish_FavoriteRecipeID",
-                        column: x => x.FavoriteRecipeID,
-                        principalTable: "Dish",
-                        principalColumn: "DishID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Feedback",
-                columns: table => new
-                {
-                    FeedbackID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Rating = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DishID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Feedback", x => x.FeedbackID);
-                    table.ForeignKey(
-                        name: "FK_Feedback_Dish_DishID",
+                        name: "FK_DishIngredient_Dish_DishID",
                         column: x => x.DishID,
                         principalTable: "Dish",
                         principalColumn: "DishID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DishIngredient_Ingredient_IngredientID",
+                        column: x => x.IngredientID,
+                        principalTable: "Ingredient",
+                        principalColumn: "IngredientID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -218,92 +215,91 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                         column: x => x.OrderID,
                         principalTable: "Order",
                         principalColumn: "OrderID",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Payment",
+                columns: table => new
+                {
+                    PaymentID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PaymentMethodID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PaymentCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    OrderID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payment", x => x.PaymentID);
+                    table.ForeignKey(
+                        name: "FK_Payment_Order_OrderID",
+                        column: x => x.OrderID,
+                        principalTable: "Order",
+                        principalColumn: "OrderID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Payment_PaymentMethod_PaymentMethodID",
+                        column: x => x.PaymentMethodID,
+                        principalTable: "PaymentMethod",
+                        principalColumn: "PaymentMethodID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChatbotAI",
+                name: "Request",
                 columns: table => new
                 {
-                    ChatbotID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Version = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: false),
-                    UserID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DishID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    RequestID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProcessAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OrderID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RequestTypeID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChatbotAI", x => x.ChatbotID);
+                    table.PrimaryKey("PK_Request", x => x.RequestID);
                     table.ForeignKey(
-                        name: "FK_ChatbotAI_Dish_DishID",
+                        name: "FK_Request_Order_OrderID",
+                        column: x => x.OrderID,
+                        principalTable: "Order",
+                        principalColumn: "OrderID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Request_RequestType_RequestTypeID",
+                        column: x => x.RequestTypeID,
+                        principalTable: "RequestType",
+                        principalColumn: "RequestTypeID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WishList",
+                columns: table => new
+                {
+                    WishListID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DishID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WishList", x => x.WishListID);
+                    table.ForeignKey(
+                        name: "FK_WishList_Dish_DishID",
                         column: x => x.DishID,
                         principalTable: "Dish",
                         principalColumn: "DishID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ChatbotAI_User_UserID",
+                        name: "FK_WishList_User_UserID",
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "UserID",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateTable(
-                name: "Recipe",
-                columns: table => new
-                {
-                    RecipeID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RecipeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IngredientID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Recipe", x => x.RecipeID);
-                    table.ForeignKey(
-                        name: "FK_Recipe_Ingredient_RecipeID",
-                        column: x => x.RecipeID,
-                        principalTable: "Ingredient",
-                        principalColumn: "IngredientID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Recipe_User_UserID",
-                        column: x => x.UserID,
-                        principalTable: "User",
-                        principalColumn: "UserID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Maintenance",
-                columns: table => new
-                {
-                    MaintenanceID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Technician = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ChatbotID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Maintenance", x => x.MaintenanceID);
-                    table.ForeignKey(
-                        name: "FK_Maintenance_ChatbotAI_ChatbotID",
-                        column: x => x.ChatbotID,
-                        principalTable: "ChatbotAI",
-                        principalColumn: "ChatbotID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatbotAI_DishID",
-                table: "ChatbotAI",
-                column: "DishID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatbotAI_UserID",
-                table: "ChatbotAI",
-                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Dish_CategoryID",
@@ -316,14 +312,19 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                 column: "MenuID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Feedback_DishID",
-                table: "Feedback",
+                name: "IX_DishIngredient_DishID",
+                table: "DishIngredient",
                 column: "DishID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Maintenance_ChatbotID",
-                table: "Maintenance",
-                column: "ChatbotID");
+                name: "IX_DishIngredient_IngredientID",
+                table: "DishIngredient",
+                column: "IngredientID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Order_TableID",
+                table: "Order",
+                column: "TableID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDetail_DishID",
@@ -341,26 +342,40 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                 column: "OrderID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Recipe_UserID",
-                table: "Recipe",
-                column: "UserID");
+                name: "IX_Payment_PaymentMethodID",
+                table: "Payment",
+                column: "PaymentMethodID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Request_OrderID",
+                table: "Request",
+                column: "OrderID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Request_RequestTypeID",
+                table: "Request",
+                column: "RequestTypeID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_RoleID",
                 table: "User",
                 column: "RoleID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WishList_DishID",
+                table: "WishList",
+                column: "DishID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WishList_UserID",
+                table: "WishList",
+                column: "UserID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "FavoriteRecipe");
-
-            migrationBuilder.DropTable(
-                name: "Feedback");
-
-            migrationBuilder.DropTable(
-                name: "Maintenance");
+                name: "DishIngredient");
 
             migrationBuilder.DropTable(
                 name: "OrderDetail");
@@ -369,16 +384,22 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                 name: "Payment");
 
             migrationBuilder.DropTable(
-                name: "Recipe");
+                name: "Request");
 
             migrationBuilder.DropTable(
-                name: "ChatbotAI");
+                name: "WishList");
+
+            migrationBuilder.DropTable(
+                name: "Ingredient");
+
+            migrationBuilder.DropTable(
+                name: "PaymentMethod");
 
             migrationBuilder.DropTable(
                 name: "Order");
 
             migrationBuilder.DropTable(
-                name: "Ingredient");
+                name: "RequestType");
 
             migrationBuilder.DropTable(
                 name: "Dish");
@@ -390,7 +411,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations
                 name: "Category");
 
             migrationBuilder.DropTable(
-                name: "Menu");
+                name: "Table");
 
             migrationBuilder.DropTable(
                 name: "UserRole");

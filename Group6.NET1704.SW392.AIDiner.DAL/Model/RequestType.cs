@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -7,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace Group6.NET1704.SW392.AIDiner.DAL
 {
-    [Table("Menu")]
-    public class Menu
+    [Table("RequestType")]
+    public class RequestType
     {
-        public Guid MenuID { get; set; }
-        public string? MenuName { get; set; }
-        public string? Description { get; set; }
+        [Key]
+        public Guid RequestTypeID { get; set; }
+        public string? RequestTypeName { get; set; }
+        
     }
 }
