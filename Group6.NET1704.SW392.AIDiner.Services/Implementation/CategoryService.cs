@@ -10,6 +10,7 @@ using Group6.NET1704.SW392.AIDiner.DAL;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using System.Linq.Expressions;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.Request;
 
 namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 {
@@ -29,8 +30,16 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
            ResponseDTO dto = new ResponseDTO();
             try
             {
-                dto.Data = await _categoryRepositoy.GetAllDataByExpression(null, 0, 0, null, true);
-               
+                var category = await _categoryRepositoy.GetAllDataByExpression(null, 0, 0, null, true);
+                dto.Data = category.Items.Select(c => new CategoryDTO
+                {
+                    Id = c.Id,
+                    Name = c.Name,                   
+                    Status = c.Status,
+                    Image = c.Image,
+                }).ToList();
+                dto.IsSucess = true;
+
 
             }
             catch (Exception ex)
