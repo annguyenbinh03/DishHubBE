@@ -52,6 +52,42 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             }
             return dto;
         }
+        public async Task<ResponseDTO> GetUserById(int id)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                var user = await _userRepository.GetById(id);
+
+                if (user == null)
+                {
+                    dto.IsSucess = false;
+                    return dto;
+                }
+
+                dto.Data = new UserDTO
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Dob = user.Dob,
+                    RoleId = user.RoleId,
+                    CreateAt = user.CreateAt,
+                    Address = user.Address,
+                    Status = user.Status,
+                    Avatar = user.Avatar
+                };
+
+                dto.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+            }
+            return dto;
+        }
 
     }
 }
