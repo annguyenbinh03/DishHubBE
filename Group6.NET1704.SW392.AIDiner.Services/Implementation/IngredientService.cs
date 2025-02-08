@@ -34,7 +34,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Id = a.Id,
                     Name = a.Name,
                     Image = a.Image,
-                    DishCount = a.DishIngredients.Count // Đếm số món ăn sử dụng nguyên liệu này
+                   
                 }).ToList();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;

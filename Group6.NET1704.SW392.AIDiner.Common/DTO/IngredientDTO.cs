@@ -11,6 +11,5 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO
         public int Id { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
-        public int DishCount { get; set; } // Số món ăn có sử dụng nguyên liệu này
     }
 }
