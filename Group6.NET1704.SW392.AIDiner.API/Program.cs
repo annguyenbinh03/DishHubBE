@@ -1,5 +1,6 @@
-﻿using Group6.NET1704.SW392.AIDiner.DAL.Implementation;
+
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
+using Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Group6.NET1704.SW392.AIDiner.Services.Implementation;
@@ -14,6 +15,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

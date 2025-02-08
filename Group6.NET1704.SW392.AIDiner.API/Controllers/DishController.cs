@@ -16,7 +16,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
         {
             _dishService = dishService;
         }
-        [HttpGet("dishes")]
+        [HttpGet("/dishes")]
         public async Task<ResponseDTO> GetAllDishes() 
         { 
         return await _dishService.GetAllDishes();
