@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FS.HotelBooking.API.Controllers
 {
-    [Route("api/user")]
+    [Route("api/users")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -20,13 +20,13 @@ namespace FS.HotelBooking.API.Controllers
             _service = service;
         }
 
-        [HttpGet("users")]
+        [HttpGet]
         public async Task<ResponseDTO> GetAllUser()
         {
             return await _service.GetAllUser();
         }
 
-        [HttpGet("users/{id}")]
+        [HttpGet("{id}")]
         public async Task<ResponseDTO> GetUserById(int id)
         {
             return await _service.GetUserById(id);

@@ -15,7 +15,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
         {
             _ingredientService = ingredientService;
         }
-        [HttpGet ("ingredients")]
+        [HttpGet]
         public async Task<ResponseDTO> GetAllIngredients()
         {
             return await _ingredientService.GetAllIngredients();
