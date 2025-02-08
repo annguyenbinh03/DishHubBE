@@ -1,16 +1,16 @@
 using System.Linq.Expressions;
 using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
-using Group6.NET1704.SW392.AIDiner.DAL.Data;
+using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FS.HotelBooking.DAL.Implementation;
 public class GenericRepository<T> : IGenericRepository<T> where T : class  
 {  
-    private AIDinerDbContext _context;  
+    private DishHubContext _context;  
     private DbSet<T> _dbSet;  
   
-    public GenericRepository(AIDinerDbContext context)  
+    public GenericRepository(DishHubContext context)  
     {        _context = context;  
         _dbSet = context.Set<T>();  
     }  

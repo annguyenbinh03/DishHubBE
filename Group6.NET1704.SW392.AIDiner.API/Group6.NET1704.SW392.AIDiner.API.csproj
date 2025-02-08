@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Group6.NET1704.SW392.AIDiner.Services\Group6.NET1704.SW392.AIDiner.Services.csproj" />
   </ItemGroup>
 
 </Project>

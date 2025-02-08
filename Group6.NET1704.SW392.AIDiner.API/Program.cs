@@ -1,15 +1,29 @@
+﻿using FS.HotelBooking.DAL.Implementation;
+using Group6.NET1704.SW392.AIDiner.DAL.Contract;
+using Group6.NET1704.SW392.AIDiner.DAL.Models;
+using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Group6.NET1704.SW392.AIDiner.Services.Implementation;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Đăng ký các dịch vụ vào container
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();  
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Đăng ký DbContext
+builder.Services.AddDbContext<DishHubContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Chỉ gọi Build() MỘT LẦN
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Cấu hình pipeline của ứng dụng
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -17,9 +31,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
