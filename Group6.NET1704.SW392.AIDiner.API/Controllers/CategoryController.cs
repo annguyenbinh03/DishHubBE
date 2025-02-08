@@ -17,7 +17,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
             _service = service;
         }
 
-        [HttpGet("category-management")]
+        [HttpGet("categories")]
         public async Task<ResponseDTO> GetAllCategory()
         {
             return await _service.GetAllCategory();

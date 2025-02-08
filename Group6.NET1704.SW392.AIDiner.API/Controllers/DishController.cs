@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Group6.NET1704.SW392.AIDiner.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/dish")]
     [ApiController]
     public class DishController : ControllerBase
     {
@@ -15,7 +15,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
         {
             _dishService = dishService;
         }
-        [HttpGet]
+        [HttpGet("dishes")]
         public async Task<ResponseDTO> GetAllDishes() 
         { 
         return await _dishService.GetAllDishes();
