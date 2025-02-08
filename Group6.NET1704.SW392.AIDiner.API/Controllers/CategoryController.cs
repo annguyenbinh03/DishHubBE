@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Group6.NET1704.SW392.AIDiner.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/category")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
             _service = service;
         }
 
-        [HttpGet]
+        [HttpGet("get-all-category")]
         public async Task<ResponseDTO> GetAllCategory()
         {
             return await _service.GetAllCategory();
