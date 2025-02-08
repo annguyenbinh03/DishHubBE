@@ -23,4 +23,8 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Group6.NET1704.SW392.AIDiner.Common\Group6.NET1704.SW392.AIDiner.Common.csproj" />
+  </ItemGroup>
+
 </Project>

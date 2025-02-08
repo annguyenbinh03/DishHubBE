@@ -29,7 +29,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
         public DbSet<UserRole> UserRoles { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("server=NGUYENTOAN;database=AIDiner;uid=sa;pwd=12345;TrustServerCertificate=True;MultipleActiveResultSets=True;");
+            optionsBuilder.UseSqlServer("DataSource=160.187.229.36;database=DishHub;UserID=sa;Password=Concunhonho111@;ConnectTimeout=30;Encrypt=True;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False,");
         }
     }
 }
