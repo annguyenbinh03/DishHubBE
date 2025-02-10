@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Group6.NET1704.SW392.AIDiner.Common\Group6.NET1704.SW392.AIDiner.Common.csproj" />
     <ProjectReference Include="..\Group6.NET1704.SW392.AIDiner.DAL\Group6.NET1704.SW392.AIDiner.DAL.csproj" />
   </ItemGroup>

@@ -91,4 +91,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             // Mark the entity as modified  
             _context.Entry(entity).State = EntityState.Modified;  
         }        return entities.ToList();  
-    }}
+    }
+    public async Task<bool> ExistsAsync(Expression<Func<T, bool>> filter)
+    {
+        return await _dbSet.AnyAsync(filter);
+    }
+}

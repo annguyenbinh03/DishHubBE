@@ -32,5 +32,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Contract
         Task<List<T>> UpdateRange(IEnumerable<T> entities);
 
         Task<T?> DeleteById(object id);
+
+        Task<bool> ExistsAsync(Expression<Func<T, bool>> filter);
     }
 }
