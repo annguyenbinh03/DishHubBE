@@ -1,16 +1,17 @@
 using System.Linq.Expressions;
 using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
+using Group6.NET1704.SW392.AIDiner.DAL.Data;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 public class GenericRepository<T> : IGenericRepository<T> where T : class  
 {  
-    private DishHubContext _context;  
+    private DishHub4Context _context;  
     private DbSet<T> _dbSet;  
   
-    public GenericRepository(DishHubContext context)  
+    public GenericRepository(DishHub4Context context)  
     {        _context = context;  
         _dbSet = context.Set<T>();  
     }  

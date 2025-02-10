@@ -1,13 +1,14 @@
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
+using Group6.NET1704.SW392.AIDiner.DAL.Data;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 
 namespace Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private DishHubContext _context;
+    private DishHub4Context _context;
 
-    public UnitOfWork(DishHubContext context)
+    public UnitOfWork(DishHub4Context context)
     {
         _context = context;
     }
