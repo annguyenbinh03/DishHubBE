@@ -1,9 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
+using Group6.NET1704.SW392.AIDiner.DAL.Data;
 using Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
-using Group6.NET1704.SW392.AIDiner.DAL.Services;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Group6.NET1704.SW392.AIDiner.Services.Implementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,13 +20,13 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
-builder.Services.AddScoped<IAuthenService, AuthenService>();
+builder.Services.AddScoped<IAuthenService, IAuthenService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Đăng ký DbContext
-builder.Services.AddDbContext<DishHubContext>(options =>
+builder.Services.AddDbContext<DishHub4Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 

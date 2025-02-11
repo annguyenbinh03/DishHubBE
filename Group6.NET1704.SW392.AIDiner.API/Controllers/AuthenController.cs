@@ -1,6 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
-using Group6.NET1704.SW392.AIDiner.DAL.Models;
-using Group6.NET1704.SW392.AIDiner.DAL.Services;
+
 using Group6.NET1704.SW392.AIDiner.DAL.ViewModel;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Microsoft.AspNetCore.Authorization;
