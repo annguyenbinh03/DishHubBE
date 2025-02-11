@@ -66,6 +66,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 {
                     dto.IsSucess = false;
                     return dto;
+
                 }
 
                 dto.Data = new UserDTO
@@ -84,10 +85,14 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 };
 
                 dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+
             }
             return dto;
         }

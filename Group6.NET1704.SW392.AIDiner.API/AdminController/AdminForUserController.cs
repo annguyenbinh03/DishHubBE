@@ -22,6 +22,12 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
             return await _service.GetAllUser(pageNumber, pageSize);
         }
 
-      
+
+        [HttpGet("{id}")]
+        public async Task<ResponseDTO> GetUserById(int id)
+        {
+            return await _service.GetUserById(id);
+        }
+
     }
 }
