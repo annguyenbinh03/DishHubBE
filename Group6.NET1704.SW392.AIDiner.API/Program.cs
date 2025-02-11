@@ -19,6 +19,8 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDishService, DishService>();
+builder.Services.AddScoped<ITableService, TableService>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddScoped<IAuthenService, AuthenService>();
