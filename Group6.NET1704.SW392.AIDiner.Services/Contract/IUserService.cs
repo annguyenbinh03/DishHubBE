@@ -9,7 +9,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
 {
     public interface IUserService
     {
-        public Task<ResponseDTO> GetAllUser();
+        public Task<ResponseDTO> GetAllUser(int pageNumber, int pageSize);
         public Task<ResponseDTO> GetUserById(int id);
     }
 }

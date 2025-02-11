@@ -20,11 +20,7 @@ namespace FS.HotelBooking.API.Controllers
             _service = service;
         }
 
-        [HttpGet]
-        public async Task<ResponseDTO> GetAllUser()
-        {
-            return await _service.GetAllUser();
-        }
+        
 
         [HttpGet("{id}")]
         public async Task<ResponseDTO> GetUserById(int id)

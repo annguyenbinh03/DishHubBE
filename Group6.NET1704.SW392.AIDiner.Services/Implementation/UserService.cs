@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
@@ -21,12 +22,12 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ResponseDTO> GetAllUser()
+        public async Task<ResponseDTO> GetAllUser(int pageNumber, int pageSize)
         {
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                var users = await _userRepository.GetAllDataByExpression(null, 0, 0, null, true, a => a.Role);
+                var users = await _userRepository.GetAllDataByExpression(null, pageNumber: pageNumber, pageSize: pageSize, a => a.Role);
 
                 dto.Data = users.Items.Select(u => new UserDTO
                 {
@@ -45,10 +46,12 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 }).ToList();
 
                 dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
             }
             return dto;
         }
