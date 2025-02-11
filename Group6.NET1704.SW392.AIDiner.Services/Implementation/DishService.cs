@@ -38,7 +38,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     CategoryId = d.CategoryId,
                    Price = d.Price,
                    Image = d.Image,
-                   Status = d.Status,
+                   //Status = d.Status,
                 }).ToList();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
@@ -71,7 +71,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     CategoryId = dish.CategoryId,
                     Price = dish.Price,
                     Image = dish.Image,
-                    Status = dish.Status,
+                    //Status = dish.Status,
                 };
                 dto.IsSucess = true;
 
