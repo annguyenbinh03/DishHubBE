@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.Model.UserModel;
 using Group6.NET1704.SW392.AIDiner.Common.UserModel;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
         public Task<ResponseDTO> GetAllUser(int pageNumber, int pageSize);
         public Task<ResponseDTO> GetUserById(int id);
         public Task<ResponseDTO> UpdateUserForAdmin(UpdateUserModel userDTO);
+        public Task<ResponseDTO> UpdateProfileUser(int id, UpdateProfileUserModel userDTO);
     }
 }

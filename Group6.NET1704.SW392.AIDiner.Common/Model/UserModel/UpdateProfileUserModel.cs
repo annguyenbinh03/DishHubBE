@@ -1,33 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Group6.NET1704.SW392.AIDiner.Common.Model.RegisterLoginModel;
 
-namespace Group6.NET1704.SW392.AIDiner.Common.UserModel
+namespace Group6.NET1704.SW392.AIDiner.Common.Model.UserModel
 {
-    public class UpdateUserModel
+    public class UpdateProfileUserModel
     {
-        public int Id { get; set; }
 
-        public string? Username { get; set; }
-       
         public string? FullName { get; set; }
-        
+
         public string? Email { get; set; }
 
+        [JsonIgnore]
+        public string? Password { get; set; }
+
         public DateTime? Dob { get; set; }
-        
+
         public string? PhoneNumber { get; set; }
-        
+
         public string? Address { get; set; }
-        
-        public bool? Status { get; set; }
 
         public string? Avatar { get; set; }
-
-       
     }
 }
