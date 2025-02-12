@@ -1,5 +1,6 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
+using Group6.NET1704.SW392.AIDiner.Common.UserModel;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
@@ -96,6 +97,76 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             }
             return dto;
         }
+
+        public async Task<ResponseDTO> UpdateUserForAdmin(UpdateUserModel userDTO)
+        {
+            try
+            {
+                var existingUser = await _userRepository.GetById(userDTO.Id);
+                if (existingUser == null)
+                {
+                    return new ResponseDTO
+                    {
+                        IsSucess = false,
+                        BusinessCode = BusinessCode.NOT_FOUND,
+                    };
+                }
+
+                if (userDTO.Username != null) existingUser.Username = userDTO.Username;
+                if (userDTO.FullName != null) existingUser.FullName = userDTO.FullName;
+                if (userDTO.Email != null) existingUser.Email = userDTO.Email;
+                if (userDTO.Dob.HasValue) existingUser.Dob = userDTO.Dob.Value;
+                if (userDTO.PhoneNumber != null) existingUser.PhoneNumber = userDTO.PhoneNumber;
+                if (userDTO.Address != null) existingUser.Address = userDTO.Address;
+                if (userDTO.Status.HasValue) existingUser.Status = userDTO.Status.Value;
+                if (userDTO.Avatar != null) existingUser.Avatar = userDTO.Avatar;
+
+                if (await _userRepository.ExistsAsync(u => u.Username == existingUser.Username && u.Id != existingUser.Id))
+                    return new ResponseDTO { IsSucess = false, BusinessCode = BusinessCode.USERNAME_ALREADY_EXISTS };
+
+                if (await _userRepository.ExistsAsync(u => u.Email == existingUser.Email && u.Id != existingUser.Id))
+                    return new ResponseDTO { IsSucess = false, BusinessCode = BusinessCode.EMAIL_ALREADY_EXISTS };
+
+                if (await _userRepository.ExistsAsync(u => u.PhoneNumber == existingUser.PhoneNumber && u.Id != existingUser.Id))
+                    return new ResponseDTO { IsSucess = false, BusinessCode = BusinessCode.PHONE_ALREADY_EXISTS };
+
+                await _userRepository.Update(existingUser);
+                await _unitOfWork.SaveChangeAsync();
+
+
+                return new ResponseDTO
+                {
+                    IsSucess = true,
+                    BusinessCode = BusinessCode.UPDATE_SUCESSFULLY,
+                    Data = new UserDTO
+                    {
+                        Id = existingUser.Id,
+                        Username = existingUser.Username,
+                        FullName = existingUser.FullName,
+                        Email = existingUser.Email,
+                        Dob = existingUser.Dob,
+                        PhoneNumber = existingUser.PhoneNumber,
+                        RoleId = existingUser.RoleId,
+                        CreateAt = existingUser.CreateAt,
+                        Address = existingUser.Address,
+                        Status = existingUser.Status,
+                        Avatar = existingUser.Avatar,
+
+                    }
+                };
+            }
+            catch
+            {
+                return new ResponseDTO
+                {
+                    IsSucess = false,
+                    BusinessCode = BusinessCode.EXCEPTION,
+                };
+            }
+        }
+
+
+
 
     }
 }
