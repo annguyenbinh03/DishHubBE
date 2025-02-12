@@ -1,6 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
-
-using Group6.NET1704.SW392.AIDiner.DAL.ViewModel;
+using Group6.NET1704.SW392.AIDiner.Common.Model.RegisterLoginModel;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -88,7 +87,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
         }
 
         [HttpGet("user-info")]
-        [Authorize] // Yêu cầu JWT Token hợp lệ
+        [Authorize] 
         public IActionResult GetUserInfo()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -97,13 +96,12 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
                 return Unauthorized(new { message = "Token không hợp lệ hoặc đã hết hạn" });
             }
 
-            // Lấy danh sách claims từ token
             var claims = identity.Claims.ToList();
 
             var userInfo = new
             {
-                UserName = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value,
-                FullName = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
+                UserId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value,
+                UserName = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value,
                 Email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
                 RoleId = claims.FirstOrDefault(c => c.Type == "RoleId")?.Value
             };

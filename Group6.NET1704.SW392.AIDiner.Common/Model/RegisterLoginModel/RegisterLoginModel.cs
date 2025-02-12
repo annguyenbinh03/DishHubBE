@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace Group6.NET1704.SW392.AIDiner.DAL.ViewModel
+namespace Group6.NET1704.SW392.AIDiner.Common.Model.RegisterLoginModel
 {
     public class RegisterLoginModel
     {

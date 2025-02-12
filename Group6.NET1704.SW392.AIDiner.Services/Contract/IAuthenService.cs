@@ -1,5 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
-using Group6.NET1704.SW392.AIDiner.DAL.ViewModel;
+using Group6.NET1704.SW392.AIDiner.Common.Model.RegisterLoginModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

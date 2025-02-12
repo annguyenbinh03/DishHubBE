@@ -4,10 +4,10 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.Model.RegisterLoginModel;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
-using Group6.NET1704.SW392.AIDiner.DAL.ViewModel;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -49,12 +49,12 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Services
 
             var claims = new[]
             {
-            new Claim(ClaimTypes.NameIdentifier, user.Username.ToString()),
-            new Claim(ClaimTypes.Name, user.FullName),
-            new Claim(ClaimTypes.Role, user.Role.Name),
-            new Claim("RoleId", user.RoleId.ToString()),
-            new Claim(ClaimTypes.Email, user.Email)
-        };
+                new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString() ?? string.Empty),
+                new Claim(ClaimTypes.Role, user.RoleId == 1 ? "User" : user.RoleId == 2 ? "Manager" : "Admin"),
+                new Claim("RoleId", user.RoleId.ToString() ?? string.Empty),
+                new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -119,8 +119,8 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Services
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, user.FullName ?? string.Empty),
-                new Claim(ClaimTypes.NameIdentifier, user.Username ?? string.Empty),
+                new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString() ?? string.Empty),
                 new Claim(ClaimTypes.Role, user.RoleId == 1 ? "User" : user.RoleId == 2 ? "Manager" : "Admin"),
                 new Claim("RoleId", user.RoleId.ToString() ?? string.Empty),
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
