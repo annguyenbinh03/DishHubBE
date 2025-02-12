@@ -116,10 +116,10 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 if (userDTO.Username != null) existingUser.Username = userDTO.Username;
                 if (userDTO.FullName != null) existingUser.FullName = userDTO.FullName;
                 if (userDTO.Email != null) existingUser.Email = userDTO.Email;
-                if (userDTO.Dob != null) existingUser.Dob = userDTO.Dob.Value;
+                if (userDTO.Dob.HasValue) existingUser.Dob = userDTO.Dob.Value;
                 if (userDTO.PhoneNumber != null) existingUser.PhoneNumber = userDTO.PhoneNumber;
                 if (userDTO.Address != null) existingUser.Address = userDTO.Address;
-                if (userDTO.Status != null) existingUser.Status = userDTO.Status.Value;
+                if (userDTO.Status.HasValue) existingUser.Status = userDTO.Status.Value;
                 if (userDTO.Avatar != null) existingUser.Avatar = userDTO.Avatar;
 
                 if (await _userRepository.ExistsAsync(u => u.Username == existingUser.Username && u.Id != existingUser.Id))
@@ -181,7 +181,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 if (userDTO.FullName != null) existingUser.FullName = userDTO.FullName;
                 if (userDTO.Email != null) existingUser.Email = userDTO.Email;
                 if (userDTO.Password != null) existingUser.Password = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
-                if (userDTO.Dob != null) existingUser.Dob = userDTO.Dob.Value;
+                if (userDTO.Dob.HasValue) existingUser.Dob = userDTO.Dob.Value;
                 if (userDTO.PhoneNumber != null) existingUser.PhoneNumber = userDTO.PhoneNumber;
                 if (userDTO.Address != null) existingUser.Address = userDTO.Address;
                 if (userDTO.Avatar != null) existingUser.Avatar = userDTO.Avatar;
