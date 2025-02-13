@@ -20,5 +20,6 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
         {
             return await _orderService.GetAllOrder();
         }
+       
     }
 }

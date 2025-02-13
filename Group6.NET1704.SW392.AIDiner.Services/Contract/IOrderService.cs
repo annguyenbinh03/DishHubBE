@@ -10,5 +10,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
     public interface IOrderService
     {
         public Task<ResponseDTO> GetAllOrder();
+        public Task<ResponseDTO> GetByOrderId(int id);
+
     }
 }
