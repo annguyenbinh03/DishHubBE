@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
 {
-    [Route("api/order")]
+    [Route("api/orders")]
     [ApiController]
     public class OrderController : ControllerBase
     {
@@ -15,11 +15,18 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
         {
             _orderService = orderService;
         }
-        [HttpGet]
-        public async Task<ResponseDTO> GetAllOrder()
+
+
+        [HttpGet("{id}")]
+        public async Task<ResponseDTO> GetByOrderId(int id)
         {
-            return await _orderService.GetAllOrder();
+            return await _orderService.GetByOrderId(id);
         }
-       
+
+        [HttpPost]
+        public async Task<ResponseDTO> CreateOrder(CreateOrderDTO request)
+        {
+            return await _orderService.CreateOrder(request);
+        }
     }
 }
