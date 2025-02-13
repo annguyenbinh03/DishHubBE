@@ -16,10 +16,12 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
             _orderService = orderService;
         }
 
-        [HttpGet("id")]
-        public async Task<ResponseDTO> GetByOrderId(int id)
+        [HttpGet("orders")]
+        public async Task<ResponseDTO> GetAllOrder()
         {
-            return await _orderService.GetByOrderId(id);
+            return await _orderService.GetAllOrder();
         }
+
+      
     }
 }
