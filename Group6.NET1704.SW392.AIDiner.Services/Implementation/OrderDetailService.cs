@@ -14,15 +14,15 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
     public class OrderDetailService : IOrderDetailService
     {
         private readonly IGenericRepository<OrderDetail> _orderDetailRepositoy;
-        private readonly IGenericRepository<Order> _orderRepository; // ✅ Thêm Order Repository
+        private readonly IGenericRepository<Order> _orderRepository; 
         private readonly IUnitOfWork _unitOfWork;
 
         public OrderDetailService(IGenericRepository<OrderDetail> orderDetailRepositoy,
-                                  IGenericRepository<Order> orderRepository, // ✅ Inject Order Repository
+                                  IGenericRepository<Order> orderRepository, 
                                   IUnitOfWork unitOfWork)
         {
             _orderDetailRepositoy = orderDetailRepositoy;
-            _orderRepository = orderRepository; // ✅ Gán repository mới
+            _orderRepository = orderRepository; 
             _unitOfWork = unitOfWork;
         }
 
@@ -39,7 +39,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     return dto;
                 }
 
-                // Lấy thông tin Order từ repository
+                //  thông tin Order từ repository
                 var order = await _orderRepository.GetByExpression(o => o.Id == orderId);
 
                 if (order == null)
@@ -49,12 +49,12 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     return dto;
                 }
 
-                // Lấy danh sách OrderDetail theo OrderId
+                //  danh sách OrderDetail theo OrderId
                 var orderDetails = await _orderDetailRepositoy.GetAllDataByExpression(
                     od => od.OrderId == orderId, 0, 0
                 );
 
-                // Nếu không có OrderDetail
+              
                 if (orderDetails == null || orderDetails.Items.Count == 0)
                 {
                     dto.IsSucess = false;
