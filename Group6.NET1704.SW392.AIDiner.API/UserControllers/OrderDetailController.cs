@@ -16,12 +16,18 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
             _orderDetailService = orderDetailService;
         }
 
-        [HttpGet("details")] 
+        [HttpGet("details")]
         public async Task<IActionResult> GetOrderDetailByOrderID([FromQuery] int orderId)
         {
             var response = await _orderDetailService.GetOrderDetailByOrderID(orderId);
             return Ok(response);
         }
 
+        [HttpPost("{id}/details")]
+        public async Task<IActionResult> AddDishToOrder([FromRoute] int id, [FromBody] List<DishRequestDTO> dishes)
+        {
+            var response = await _orderDetailService.AddDishToOrder(id, dishes);
+            return Ok(response);
+        }
     }
 }

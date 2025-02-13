@@ -10,6 +10,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
     public interface IOrderDetailService
     {
         public Task<ResponseDTO> GetOrderDetailByOrderID(int orderId);
+        public Task<ResponseDTO> AddDishToOrder(int orderId, List<DishRequestDTO> dishes);
 
     }
 }
