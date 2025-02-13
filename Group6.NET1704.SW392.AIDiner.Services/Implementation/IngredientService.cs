@@ -23,26 +23,81 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             _ingredientRepository = ingredientRepository;
         }
 
-        public async Task<ResponseDTO> GetAllIngredients()
+        public async Task<ResponseDTO> CreateIngredient(CreateUpdateIngredientDTO createUpdateIngredientDTO)
         {
-           ResponseDTO dto = new ResponseDTO();
+            ResponseDTO dto = new ResponseDTO();
             try
             {
-                var ingredients = await _ingredientRepository.GetAllDataByExpression(null, 0 , 0 , null, true);
+                var newIngredient = new Ingredient
+                {
+                    Name = createUpdateIngredientDTO.Name,
+                    Image = createUpdateIngredientDTO.Image,
+                };
+                await _ingredientRepository.Insert(newIngredient);
+                await _unitOfWork.SaveChangeAsync();
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.CREATE_SUCCESS;
+                dto.Data = new { newIngredient.Id, newIngredient.Name, };
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Data = ex.Message;
+            }
+            return dto;
+        }
+
+        public async Task<ResponseDTO> GetAllIngredients()
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                var ingredients = await _ingredientRepository.GetAllDataByExpression(null, 0, 0, null, true);
                 dto.Data = ingredients.Items.Select(a => new IngredientDTO
                 {
                     Id = a.Id,
                     Name = a.Name,
                     Image = a.Image,
-                   
+
                 }).ToList();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+            }
+            return dto;
+        }
+
+        public async Task<ResponseDTO> UpdateIngredient(int id, CreateUpdateIngredientDTO createUpdateIngredientDTO)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                var ingredient = await _ingredientRepository.GetById(id);
+                if (ingredient == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.NOT_FOUND;
+                    return dto;
+                }
+                ingredient.Name = createUpdateIngredientDTO.Name;
+                ingredient.Image = createUpdateIngredientDTO.Image;
+                 await _ingredientRepository.Update(ingredient);
+                await _unitOfWork.SaveChangeAsync();
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.UPDATE_SUCESSFULLY;
+                dto.Data = new { ingredient.Id, ingredient.Name, ingredient.Image, };
+
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode=BusinessCode.EXCEPTION;
+                dto.Data = ex.Message;
             }
             return dto;
         }

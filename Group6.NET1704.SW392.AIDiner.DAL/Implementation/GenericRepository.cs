@@ -97,4 +97,19 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         return await _dbSet.AnyAsync(filter);
     }
+
+    public async Task<List<Dish>> GetDishesWithIngredients(Expression<Func<Dish, bool>>? filter = null)
+    {
+        IQueryable<Dish> query = _context.Dishes
+        .Include(d => d.Category) // Include category
+        .Include(d => d.DishIngredients) // Include DishIngredients
+        .ThenInclude(di => di.Ingredient); // Include Ingredient t? DishIngredients
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        return await query.ToListAsync();
+    }
 }

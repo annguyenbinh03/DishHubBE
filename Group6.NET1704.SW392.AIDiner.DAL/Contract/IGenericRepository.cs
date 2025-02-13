@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,5 +35,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Contract
         Task<T?> DeleteById(object id);
 
         Task<bool> ExistsAsync(Expression<Func<T, bool>> filter);
+
+        Task<List<Dish>> GetDishesWithIngredients(Expression<Func<Dish, bool>>? filter = null);
     }
 }
