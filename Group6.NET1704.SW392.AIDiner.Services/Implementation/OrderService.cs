@@ -53,5 +53,45 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             }
             return dto;
         }
+
+        public async Task<ResponseDTO> GetByOrderId(int id)
+        {
+          
+                ResponseDTO dto = new ResponseDTO();
+                try
+                {
+                    var order = await _orderRepository.GetById(id);
+
+                    if (order == null)
+                    {
+                        dto.IsSucess = false;
+                        return dto;
+
+                    }
+
+                    dto.Data = new OrderDTO
+                    {
+                        Id=order.Id,
+                        CustomerId=order.CustomerId,
+                        TableId=order.TableId,
+                        TotalAmount = order.TotalAmount,
+                        PaymentStatus = order.PaymentStatus,
+                        CreatedAt = order.CreatedAt,
+                        Status = order.Status,
+                    };
+
+                    dto.IsSucess = true;
+                    dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+
+                }
+                catch (Exception ex)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+
+                }
+                return dto;
+            }
+        }
     }
-}
+
