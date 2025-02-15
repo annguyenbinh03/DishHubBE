@@ -24,6 +24,42 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<ResponseDTO> CreateOrder(CreateOrderDTO request)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                if (request == null || request.CustomerId <= 0 || request.TableId <= 0 || request.TotalAmount <=0)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode=BusinessCode.INVALID_INPUT;
+                    return dto;
+                }
+                Order newOrder = new Order  
+                {
+                    CustomerId = request.CustomerId,
+                    TableId = request.TableId,
+                    TotalAmount = request.TotalAmount,
+                    PaymentStatus = request.PaymentStatus,
+                    CreatedAt = DateTime.Now,
+                    Status = request.Status,
+                };
+
+                // Lưu vào database
+                await _orderRepository.Insert(newOrder);
+                await _unitOfWork.SaveChangeAsync();
+
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.CREATE_ORDER_SUCCESSFULLY;
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode=BusinessCode.EXCEPTION;
+            }
+            return dto;
+        }
 
         public async Task<ResponseDTO> GetAllOrder()
         {
@@ -53,5 +89,45 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             }
             return dto;
         }
+
+        public async Task<ResponseDTO> GetByOrderId(int id)
+        {
+          
+                ResponseDTO dto = new ResponseDTO();
+                try
+                {
+                    var order = await _orderRepository.GetById(id);
+
+                    if (order == null)
+                    {
+                        dto.IsSucess = false;
+                        return dto;
+
+                    }
+
+                    dto.Data = new OrderDTO
+                    {
+                        Id=order.Id,
+                        CustomerId=order.CustomerId,
+                        TableId=order.TableId,
+                        TotalAmount = order.TotalAmount,
+                        PaymentStatus = order.PaymentStatus,
+                        CreatedAt = order.CreatedAt,
+                        Status = order.Status,
+                    };
+
+                    dto.IsSucess = true;
+                    dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+
+                }
+                catch (Exception ex)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.EXCEPTION;
+
+                }
+                return dto;
+            }
+        }
     }
-}
+

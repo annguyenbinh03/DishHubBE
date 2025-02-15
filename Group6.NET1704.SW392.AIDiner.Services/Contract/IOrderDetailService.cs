@@ -7,12 +7,9 @@ using System.Threading.Tasks;
 
 namespace Group6.NET1704.SW392.AIDiner.Services.Contract
 {
-    public interface IOrderService
+    public interface IOrderDetailService
     {
-        public Task<ResponseDTO> GetAllOrder();
-        public Task<ResponseDTO> GetByOrderId(int id);
-        public Task<ResponseDTO> CreateOrder(CreateOrderDTO request);
-
+        public Task<ResponseDTO> GetOrderDetailByOrderID(int orderId);
 
     }
 }
