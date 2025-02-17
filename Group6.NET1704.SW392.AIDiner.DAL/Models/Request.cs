@@ -11,6 +11,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Models
         public string? Note { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ProcessedAt { get; set; }
+        public string Status { get; set; } = null!;
 
         public virtual Order Order { get; set; } = null!;
         public virtual RequestType Type { get; set; } = null!;

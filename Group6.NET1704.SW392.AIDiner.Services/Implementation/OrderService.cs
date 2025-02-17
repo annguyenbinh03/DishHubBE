@@ -37,7 +37,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 }
                 Order newOrder = new Order  
                 {
-                    CustomerId = request.CustomerId,
+                    //CustomerId = request.CustomerId,
                     TableId = request.TableId,
                     TotalAmount = request.TotalAmount,
                     PaymentStatus = request.PaymentStatus,
@@ -67,11 +67,11 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             try
             {
                 var orders = await _orderRepository.GetAllDataByExpression(null, 0, 0, null, true,
-                     includes: new Expression<Func<Order, object>>[] { b => b.Customer, b => b.Table });
+                     includes: new Expression<Func<Order, object>>[] { b => b.Table });
                 dto.Data = orders.Items.Select(x => new OrderDTO
                 {
                     Id = x.Id,
-                    CustomerId = x.CustomerId,
+                    //CustomerId = x.CustomerId,
                     TableId = x.TableId,
                     TotalAmount = x.TotalAmount,
                     PaymentStatus = x.PaymentStatus,
@@ -108,7 +108,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     dto.Data = new OrderDTO
                     {
                         Id=order.Id,
-                        CustomerId=order.CustomerId,
+                        //CustomerId=order.CustomerId,
                         TableId=order.TableId,
                         TotalAmount = order.TotalAmount,
                         PaymentStatus = order.PaymentStatus,

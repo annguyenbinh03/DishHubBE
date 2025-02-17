@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Group6.NET1704.SW392.AIDiner.DAL.Data
 {
-    public partial class DishHub4Context : DbContext
+    public partial class DishHub5Context : DbContext
     {
-        public DishHub4Context()
+        public DishHub5Context()
         {
         }
 
-        public DishHub4Context(DbContextOptions<DishHub4Context> options)
+        public DishHub5Context(DbContextOptions<DishHub5Context> options)
             : base(options)
         {
         }
@@ -27,12 +27,19 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
         public virtual DbSet<PaymentMethod> PaymentMethods { get; set; } = null!;
         public virtual DbSet<Request> Requests { get; set; } = null!;
         public virtual DbSet<RequestType> RequestTypes { get; set; } = null!;
+        public virtual DbSet<Restaurant> Restaurants { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
         public virtual DbSet<Table> Tables { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
-        public virtual DbSet<WishList> WishLists { get; set; } = null!;
 
-        
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=DishHub5;Integrated Security=True;TrustServerCertificate=True;");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,7 +72,13 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
                     .WithMany(p => p.Dishes)
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Dish__CategoryId__3D5E1FD2");
+                    .HasConstraintName("FK__Dish__CategoryId__412EB0B6");
+
+                entity.HasOne(d => d.Restaurant)
+                    .WithMany(p => p.Dishes)
+                    .HasForeignKey(d => d.RestaurantId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Dish__Restaurant__4222D4EF");
             });
 
             modelBuilder.Entity<DishIngredient>(entity =>
@@ -76,13 +89,13 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
                     .WithMany(p => p.DishIngredients)
                     .HasForeignKey(d => d.DishId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__DishIngre__DishI__403A8C7D");
+                    .HasConstraintName("FK__DishIngre__DishI__44FF419A");
 
                 entity.HasOne(d => d.Ingredient)
                     .WithMany(p => p.DishIngredients)
                     .HasForeignKey(d => d.IngredientId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__DishIngre__Ingre__412EB0B6");
+                    .HasConstraintName("FK__DishIngre__Ingre__45F365D3");
             });
 
             modelBuilder.Entity<Ingredient>(entity =>
@@ -106,22 +119,24 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
 
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(10, 2)");
 
-                entity.HasOne(d => d.Customer)
+                entity.HasOne(d => d.Restaurant)
                     .WithMany(p => p.Orders)
-                    .HasForeignKey(d => d.CustomerId)
+                    .HasForeignKey(d => d.RestaurantId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Order__CustomerI__534D60F1");
+                    .HasConstraintName("FK__Order__Restauran__5535A963");
 
                 entity.HasOne(d => d.Table)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.TableId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Order__TableId__5441852A");
+                    .HasConstraintName("FK__Order__TableId__5629CD9C");
             });
 
             modelBuilder.Entity<OrderDetail>(entity =>
             {
                 entity.ToTable("OrderDetail");
+
+                entity.Property(e => e.Note).HasMaxLength(1000);
 
                 entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
 
@@ -133,13 +148,13 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.DishId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderDeta__DishI__5AEE82B9");
+                    .HasConstraintName("FK__OrderDeta__DishI__5CD6CB2B");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.OrderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderDeta__Order__59FA5E80");
+                    .HasConstraintName("FK__OrderDeta__Order__5BE2A6F2");
             });
 
             modelBuilder.Entity<Payment>(entity =>
@@ -158,13 +173,13 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
                     .WithMany(p => p.Payments)
                     .HasForeignKey(d => d.MethodId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Payment__MethodI__619B8048");
+                    .HasConstraintName("FK__Payment__MethodI__6383C8BA");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.Payments)
                     .HasForeignKey(d => d.OrderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Payment__OrderId__60A75C0F");
+                    .HasConstraintName("FK__Payment__OrderId__628FA481");
             });
 
             modelBuilder.Entity<PaymentMethod>(entity =>
@@ -184,17 +199,21 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
 
                 entity.Property(e => e.ProcessedAt).HasColumnType("datetime");
 
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20)
+                    .HasDefaultValueSql("('pending')");
+
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.Requests)
                     .HasForeignKey(d => d.OrderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Request__OrderId__6754599E");
+                    .HasConstraintName("FK__Request__OrderId__6B24EA82");
 
                 entity.HasOne(d => d.Type)
                     .WithMany(p => p.Requests)
                     .HasForeignKey(d => d.TypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Request__TypeId__68487DD7");
+                    .HasConstraintName("FK__Request__TypeId__6C190EBB");
             });
 
             modelBuilder.Entity<RequestType>(entity =>
@@ -202,6 +221,25 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
                 entity.ToTable("RequestType");
 
                 entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<Restaurant>(entity =>
+            {
+                entity.ToTable("Restaurant");
+
+                entity.Property(e => e.Address).HasMaxLength(255);
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.PhoneNumber).HasMaxLength(15);
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -221,18 +259,26 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
 
                 entity.Property(e => e.Name).HasMaxLength(255);
 
+                entity.Property(e => e.Password).HasMaxLength(30);
+
                 entity.Property(e => e.Qrcode)
                     .HasMaxLength(255)
                     .HasColumnName("QRCode");
 
                 entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.HasOne(d => d.Restaurant)
+                    .WithMany(p => p.Tables)
+                    .HasForeignKey(d => d.RestaurantId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Table__Restauran__5165187F");
             });
 
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("User");
 
-                entity.HasIndex(e => e.Email, "UQ__User__A9D10534EF3C6A55")
+                entity.HasIndex(e => e.Email, "UQ__User__A9D10534A3C6DFD5")
                     .IsUnique();
 
                 entity.Property(e => e.Avatar).HasMaxLength(255);
@@ -256,24 +302,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Data
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.RoleId)
-                    .HasConstraintName("FK__User__RoleId__47DBAE45");
-            });
-
-            modelBuilder.Entity<WishList>(entity =>
-            {
-                entity.ToTable("WishList");
-
-                entity.HasOne(d => d.Dish)
-                    .WithMany(p => p.WishLists)
-                    .HasForeignKey(d => d.DishId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__WishList__DishId__4BAC3F29");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.WishLists)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__WishList__UserId__4AB81AF0");
+                    .HasConstraintName("FK__User__RoleId__4CA06362");
             });
 
             OnModelCreatingPartial(modelBuilder);

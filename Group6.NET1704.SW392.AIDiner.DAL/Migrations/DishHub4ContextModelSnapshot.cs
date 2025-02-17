@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations.DishHub4
 {
-    [DbContext(typeof(DishHub4Context))]
+    [DbContext(typeof(DishHub5Context))]
     partial class DishHub4ContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

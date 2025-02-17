@@ -9,7 +9,6 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Models
         {
             DishIngredients = new HashSet<DishIngredient>();
             OrderDetails = new HashSet<OrderDetail>();
-            WishLists = new HashSet<WishList>();
         }
 
         public int Id { get; set; }
@@ -21,10 +20,11 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Models
         public string Status { get; set; } = null!;
         public string? Image { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public int RestaurantId { get; set; }
 
         public virtual Category Category { get; set; } = null!;
+        public virtual Restaurant Restaurant { get; set; } = null!;
         public virtual ICollection<DishIngredient> DishIngredients { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        public virtual ICollection<WishList> WishLists { get; set; }
     }
 }

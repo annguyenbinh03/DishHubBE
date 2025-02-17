@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 public class GenericRepository<T> : IGenericRepository<T> where T : class  
 {  
-    private DishHub4Context _context;  
+    private DishHub5Context _context;  
     private DbSet<T> _dbSet;  
   
-    public GenericRepository(DishHub4Context context)  
+    public GenericRepository(DishHub5Context context)  
     {        _context = context;  
         _dbSet = context.Set<T>();  
     }  

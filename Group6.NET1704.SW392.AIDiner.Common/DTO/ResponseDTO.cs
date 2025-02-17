@@ -11,5 +11,7 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO
         public bool IsSucess { get; set; } = true;
         public object Data { get; set; }
         public BusinessCode.BusinessCode BusinessCode { get; set; }
+
+        public String message { get; set; }
     }
 }

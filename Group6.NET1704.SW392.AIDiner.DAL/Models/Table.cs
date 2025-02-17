@@ -16,7 +16,10 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Models
         public string? Qrcode { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string Status { get; set; } = null!;
+        public int RestaurantId { get; set; }
+        public string? Password { get; set; }
 
+        public virtual Restaurant Restaurant { get; set; } = null!;
         public virtual ICollection<Order> Orders { get; set; }
     }
 }

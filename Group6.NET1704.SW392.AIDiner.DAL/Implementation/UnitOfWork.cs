@@ -6,9 +6,9 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private DishHub4Context _context;
+    private DishHub5Context _context;
 
-    public UnitOfWork(DishHub4Context context)
+    public UnitOfWork(DishHub5Context context)
     {
         _context = context;
     }

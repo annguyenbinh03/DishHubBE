@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Group6.NET1704.SW392.AIDiner.DAL.Migrations.DishHub4
 {
-    [DbContext(typeof(DishHub4Context))]
+    [DbContext(typeof(DishHub5Context))]
     [Migration("20250210155721_InitialCreate")]
     partial class InitialCreate
     {

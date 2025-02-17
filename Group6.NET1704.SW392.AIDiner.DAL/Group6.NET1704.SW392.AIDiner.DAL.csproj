@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Group6.NET1704.SW392.AIDiner.Common\Group6.NET1704.SW392.AIDiner.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>

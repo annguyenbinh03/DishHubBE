@@ -69,7 +69,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Order = new
                     {
                         order.Id,
-                        order.CustomerId,
+                       // order.CustomerId,
                         order.TableId,
                         order.TotalAmount,
                         order.PaymentStatus,

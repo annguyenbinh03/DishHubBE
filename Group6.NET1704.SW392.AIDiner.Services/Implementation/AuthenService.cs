@@ -39,13 +39,13 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Services
             }
 
             var user = await _userRepository.GetByExpression(
-                u => u.Username == model.UserName && u.Status == true,
+                u => u.Username == model.UserName && u.Status == true && u.Password == model.Password,
                 u => u.Role);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
-            {
-                return null;
-            }
+            //if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
+            //{
+            //    return null;
+            //}
 
             var claims = new[]
             {
