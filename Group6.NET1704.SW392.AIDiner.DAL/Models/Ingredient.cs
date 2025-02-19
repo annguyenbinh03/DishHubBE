@@ -13,6 +13,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Models
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Image { get; set; }
+        public bool IsDeleted { get; set; }
 
         public virtual ICollection<DishIngredient> DishIngredients { get; set; }
     }

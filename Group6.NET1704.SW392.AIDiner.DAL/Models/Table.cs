@@ -13,11 +13,10 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Models
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
-        public string? Qrcode { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string Status { get; set; } = null!;
+        public bool IsDeleted { get; set; }
         public int RestaurantId { get; set; }
-        public string? Password { get; set; }
 
         public virtual Restaurant Restaurant { get; set; } = null!;
         public virtual ICollection<Order> Orders { get; set; }

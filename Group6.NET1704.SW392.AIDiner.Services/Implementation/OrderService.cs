@@ -99,7 +99,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     filter: o => o.Id == id,0, 0,
                     includes: new Expression<Func<Order, object>>[]
                     {
-                o => o.Restaurant,  
                 o => o.Table });
 
                 var orderData = order.Items.FirstOrDefault();

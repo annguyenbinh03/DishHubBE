@@ -18,9 +18,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Models
         public bool PaymentStatus { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string Status { get; set; } = null!;
-        public int RestaurantId { get; set; }
 
-        public virtual Restaurant Restaurant { get; set; } = null!;
         public virtual Table Table { get; set; } = null!;
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }

@@ -42,7 +42,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     RoleId = u.RoleId,
                     CreateAt = u.CreateAt,
                     Address = u.Address,
-                    Status = u.Status,
+                   // Status = u.Status,
                     Avatar = u.Avatar
 
                 }).ToList();
@@ -82,7 +82,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     RoleId = user.RoleId,
                     CreateAt = user.CreateAt,
                     Address = user.Address,
-                    Status = user.Status,
+                    //Status = user.Status,
                     Avatar = user.Avatar
                 };
 
@@ -119,7 +119,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 if (userDTO.Dob.HasValue) existingUser.Dob = userDTO.Dob.Value;
                 if (userDTO.PhoneNumber != null) existingUser.PhoneNumber = userDTO.PhoneNumber;
                 if (userDTO.Address != null) existingUser.Address = userDTO.Address;
-                if (userDTO.Status.HasValue) existingUser.Status = userDTO.Status.Value;
+                //if (userDTO.Status.HasValue) existingUser.Status = userDTO.Status.Value;
                 if (userDTO.Avatar != null) existingUser.Avatar = userDTO.Avatar;
 
                 if (await _userRepository.ExistsAsync(u => u.Username == existingUser.Username && u.Id != existingUser.Id))
@@ -148,7 +148,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         Dob = existingUser.Dob,
                         PhoneNumber = existingUser.PhoneNumber,
                         Address = existingUser.Address,
-                        Status = existingUser.Status,
+                        //Status = existingUser.Status,
                         Avatar = existingUser.Avatar,
 
                     }

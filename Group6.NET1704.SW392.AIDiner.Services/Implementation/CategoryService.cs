@@ -35,7 +35,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 {
                     Id = c.Id,
                     Name = c.Name,                   
-                    Status = c.Status,
+                    //Status = c.Status,
                     Image = c.Image,
                 }).ToList();
                 dto.IsSucess = true;
