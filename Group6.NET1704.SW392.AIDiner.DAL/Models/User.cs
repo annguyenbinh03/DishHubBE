@@ -15,7 +15,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Models
         public int? RoleId { get; set; }
         public DateTime? CreateAt { get; set; }
         public string? Address { get; set; }
-        public bool Status { get; set; }
+        public bool IsDeleted { get; set; }
         public string? Avatar { get; set; }
 
         public virtual Role? Role { get; set; }

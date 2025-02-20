@@ -34,7 +34,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Id = d.Id,
                     Name = d.Name,
                     Description = d.Description,
-                    Qrcode = d.Qrcode,
+                    //Qrcode = d.Qrcode,
                     CreatedAt = d.CreatedAt,
                     Status = d.Status,
                 }).ToList();

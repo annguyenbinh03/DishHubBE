@@ -39,7 +39,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Services
             }
 
             var user = await _userRepository.GetByExpression(
-                u => u.Username == model.UserName && u.Status == true && u.Password == model.Password,
+                u => u.Username == model.UserName /*&& u.Status == true*/ && u.Password == model.Password,
                 u => u.Role);
 
             //if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
@@ -95,7 +95,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Services
                     RoleId = 1,
                     CreateAt = DateTime.UtcNow,
                     Address = model.Address,
-                    Status = true,
+                    //Status = true,
                     Avatar = model.Avatar
                 };
 

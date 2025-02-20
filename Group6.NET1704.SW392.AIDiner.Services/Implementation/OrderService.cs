@@ -92,42 +92,56 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
         public async Task<ResponseDTO> GetByOrderId(int id)
         {
-          
-                ResponseDTO dto = new ResponseDTO();
-                try
-                {
-                    var order = await _orderRepository.GetById(id);
-
-                    if (order == null)
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                var order = await _orderRepository.GetAllDataByExpression(
+                    filter: o => o.Id == id,0, 0,
+                    includes: new Expression<Func<Order, object>>[]
                     {
-                        dto.IsSucess = false;
-                        return dto;
+                o => o.Table });
 
-                    }
-
-                    dto.Data = new OrderDTO
-                    {
-                        Id=order.Id,
-                        //CustomerId=order.CustomerId,
-                        TableId=order.TableId,
-                        TotalAmount = order.TotalAmount,
-                        PaymentStatus = order.PaymentStatus,
-                        CreatedAt = order.CreatedAt,
-                        Status = order.Status,
-                    };
-
-                    dto.IsSucess = true;
-                    dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
-
-                }
-                catch (Exception ex)
+                var orderData = order.Items.FirstOrDefault();
+                if (orderData == null)
                 {
                     dto.IsSucess = false;
-                    dto.BusinessCode = BusinessCode.EXCEPTION;
-
+                    return dto;
                 }
-                return dto;
+
+                dto.Data = new OrderDTO
+                {
+                    Id = orderData.Id,
+                    TableId = orderData.TableId,
+                    TableName = orderData.Table.Name,
+
+                    TotalAmount = orderData.TotalAmount,
+                    PaymentStatus = orderData.PaymentStatus,
+                    CreatedAt = orderData.CreatedAt,
+                    Status = orderData.Status,
+
+
+
+                    //    TableName = new TableForOrderDTO
+                    //    {
+                    //        TableName = orderData.Table.Name,
+
+                    //    }
+                };
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.message = "Get Order by ID successfully";
             }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+            }
+            return dto;
         }
+
+
+
     }
+}
 
