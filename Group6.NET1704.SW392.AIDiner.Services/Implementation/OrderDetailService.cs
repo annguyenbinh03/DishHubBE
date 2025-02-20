@@ -6,6 +6,7 @@ using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,7 +41,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     return dto;
                 }
 
-                //  thông tin Order từ repository
+                // Lấy thông tin Order từ repository
                 var order = await _orderRepository.GetByExpression(o => o.Id == orderId);
 
                 if (order == null)
@@ -50,11 +51,13 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     return dto;
                 }
 
-                //  danh sách OrderDetail theo OrderId
+                // Lấy danh sách OrderDetail theo OrderId, kèm thông tin món ăn từ Dish
                 var orderDetails = await _orderDetailRepositoy.GetAllDataByExpression(
-                    od => od.OrderId == orderId, 0, 0
+                    od => od.OrderId == orderId, 0, 0, includes: new Expression<Func<OrderDetail, object>>[]
+                    {
+                od => od.Dish  // Include Dish để lấy thông tin chi tiết món ăn
+                    }
                 );
-
 
                 if (orderDetails == null || orderDetails.Items.Count == 0)
                 {
@@ -69,7 +72,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Order = new
                     {
                         order.Id,
-                       // order.CustomerId,
                         order.TableId,
                         order.TotalAmount,
                         order.PaymentStatus,
@@ -77,16 +79,21 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         order.Status,
                         OrderDetails = orderDetails.Items.Select(orderdetail => new
                         {
+                            orderdetail.Id,
                             orderdetail.DishId,
+                            Name = orderdetail.Dish.Name, // Lấy tên món ăn từ Dish
+                            Image = orderdetail.Dish.Image, // Lấy ảnh món ăn từ Dish
                             orderdetail.Quantity,
                             orderdetail.Price,
-                            orderdetail.Status
+                            orderdetail.Status,
+                            orderdetail.Note,
                         }).ToList()
                     }
                 };
 
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.message = "Get OrderID by Orderdetail Successfully";
             }
             catch (Exception ex)
             {
@@ -96,6 +103,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
             return dto;
         }
+
 
         public async Task<ResponseDTO> AddDishToOrder(int orderId, List<DishRequestDTO> dishes)
         {
