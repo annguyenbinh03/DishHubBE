@@ -1,5 +1,7 @@
-﻿using Group6.NET1704.SW392.AIDiner.Common.Response;
+﻿using Group6.NET1704.SW392.AIDiner.Common.Request;
+using Group6.NET1704.SW392.AIDiner.Common.Response;
 using Group6.NET1704.SW392.AIDiner.DAL.Data;
+using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -55,6 +57,62 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Repositories
             .ToListAsync();
 
             return response;
+        }
+
+        public async Task<RestaurantCreationReponse> Create(RestaurantCreationRequest request)
+        {
+            var restaurant = new Restaurant
+            {
+                Name = request.Name,
+                Address = request.Address,
+                PhoneNumber = request.PhoneNumber,
+                Image = request.Image,
+                IsDeleted = false, 
+                CreatedAt = DateTime.UtcNow 
+            };
+
+            _context.Restaurants.Add(restaurant);
+            await _context.SaveChangesAsync();
+
+            return new RestaurantCreationReponse
+            {
+                Id = restaurant.Id,
+                Name = restaurant.Name,
+                Address = restaurant.Address,
+                PhoneNumber = restaurant.PhoneNumber,
+                Image = restaurant.Image,
+                IsDeleted = restaurant.IsDeleted,
+                CreatedAt = restaurant.CreatedAt
+            };
+        }
+
+        public async Task<RestaurantUpdateReponse> Update(int Id, RestaurantUpdateRequest request)
+        {
+            var restaurant = await _context.Restaurants.FirstOrDefaultAsync(r => r.Id == Id);
+            if (restaurant == null)
+            {
+                throw new KeyNotFoundException($"Restaurant with ID {Id} not found.");
+            }
+            restaurant.Name = request.Name;
+            restaurant.Address = request.Address;
+            restaurant.PhoneNumber = request.PhoneNumber;
+            restaurant.Image = request.Image;
+            restaurant.IsDeleted = request.IsDeleted;
+
+            // Lưu thay đổi vào database
+            await _context.SaveChangesAsync();
+
+            // Trả về response
+            return new RestaurantUpdateReponse
+            {
+                Id = restaurant.Id,
+                Name = restaurant.Name,
+                Address = restaurant.Address,
+                PhoneNumber = restaurant.PhoneNumber,
+                Image = restaurant.Image,
+                IsDeleted = restaurant.IsDeleted,
+                CreatedAt = restaurant.CreatedAt
+            };
         }
     }
 }
