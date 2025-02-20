@@ -14,7 +14,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
     {
         public  Task<ResponseDTO> GetAllDishes();
         public Task<ResponseDTO> GetDishByIdAsync(int dishId);
-        public Task<ResponseDTO> GetDishesForAdmin(string? category, int page, int size, string? search, string? sortBy, string? sortOrder);
+        public Task<ResponseDTO> GetDishesForAdmin(int? categoryId, int page, int size, string? search, string? sortBy, string? sortOrder);
         public Task<ResponseDTO> CreateDish(CreateDishDTO createDishDTO);
         public Task<ResponseDTO> UpdateDish(int dishId ,UpdateDishDTO updateDishDTO);
     }

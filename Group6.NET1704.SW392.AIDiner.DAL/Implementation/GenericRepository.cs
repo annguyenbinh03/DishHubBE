@@ -112,4 +112,16 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
         return await query.ToListAsync();
     }
+
+    public IQueryable<T> GetQueryable()
+    {
+        return _dbSet.AsQueryable();
+    }
+
+    public async Task DeleteWhere(Expression<Func<T, bool>> predicate)
+    {
+        var entities = _context.Set<T>().Where(predicate);
+        _context.Set<T>().RemoveRange(entities);
+        await _context.SaveChangesAsync();
+    }
 }
