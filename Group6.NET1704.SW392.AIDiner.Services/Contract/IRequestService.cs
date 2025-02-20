@@ -10,5 +10,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
     public interface IRequestService
     {
         public Task<ResponseDTO> GetRequestByOrderID(int orderID);
+        public Task<ResponseDTO> CreateRequest(CreateRequestDTO requestDto);
     }
 }

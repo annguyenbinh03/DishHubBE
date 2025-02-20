@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
 {
-    [Route("api/requests/history")]
+    [Route("api/requests")]
     [ApiController]
     public class RequestController : ControllerBase
     {
@@ -15,10 +15,10 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
         {
             _requestService = requestService;
         }
-        [HttpGet]
-        public async Task<ResponseDTO> GetRequestByOrderID(int orderID)
+        [HttpPost]
+        public async Task<ResponseDTO> CreateRequest(CreateRequestDTO requestDto)
         {
-            return await _requestService.GetRequestByOrderID(orderID);
+            return await _requestService.CreateRequest(requestDto);
         }
     }
 }

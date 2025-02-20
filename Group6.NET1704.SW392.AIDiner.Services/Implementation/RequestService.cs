@@ -14,11 +14,17 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
     public class RequestService : IRequestService
     {
         private IGenericRepository<Request> _requestRepository;
+        private IGenericRepository<Order> _orderRepository;
+        private IGenericRepository<RequestType> _requestTypeRepository;
+
+
         private IUnitOfWork _unitOfWork;
 
-        public RequestService(IGenericRepository<Request> requestRepository, IUnitOfWork unitOfWork)
+        public RequestService(IGenericRepository<Request> requestRepository, IGenericRepository<Order> orderRepository, IGenericRepository<RequestType> requestTypeRepository, IUnitOfWork unitOfWork)
         {
             _requestRepository = requestRepository;
+            _orderRepository = orderRepository;
+            _requestTypeRepository = requestTypeRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -62,5 +68,72 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             }
             return dto;
         }
+
+
+        public async Task<ResponseDTO> CreateRequest(CreateRequestDTO requestDto)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                if (requestDto == null || requestDto.OrderId <= 0 || requestDto.TypeId <= 0)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.INVALID_INPUT;
+                    dto.message = "Invalid input parameters";
+                    return dto;
+                }
+
+                // Kiểm tra OrderId và TypeId có tồn tại không
+                var existingOrder = await _orderRepository.GetById(requestDto.OrderId);
+                if (existingOrder == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.NOT_FOUND;
+                    dto.message = "Order not found";
+                    return dto;
+                }
+
+                var existingType = await _requestTypeRepository.GetById(requestDto.TypeId);
+                if (existingType == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.NOT_FOUND;
+                    dto.message = "Request type not found";
+                    return dto;
+                }
+
+                Request newRequest = new Request
+                {
+                    OrderId = requestDto.OrderId,
+                    TypeId = requestDto.TypeId,
+                    Note = requestDto.Note,
+                    CreatedAt = DateTime.UtcNow,
+                    Status = "pending"
+                };
+
+                await _requestRepository.Insert(newRequest);
+                await _unitOfWork.SaveChangeAsync(); // Chỉ gọi 1 hàm lưu dữ liệu
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.CREATE_SUCCESS;
+                dto.message = "Request created successfully";
+                dto.Data = new RequestDTO
+                {
+                    Id = newRequest.Id,
+                    TypeId = newRequest.TypeId,
+                    CreatedAt = newRequest.CreatedAt,
+                    Note = newRequest.Note,
+                    Status = newRequest.Status
+                };
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.message = $"An error occurred while creating request: {ex.Message} {ex.InnerException?.Message}";
+            }
+            return dto;
+        }
+
     }
 }
