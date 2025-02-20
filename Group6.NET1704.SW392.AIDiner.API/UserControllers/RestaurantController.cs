@@ -5,7 +5,7 @@ using Group6.NET1704.SW392.AIDiner.Common.Response;
 
 namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
 {
-    [Route("api/restaurant")]
+    [Route("api/restaurants")]
     [ApiController]
     public class RestaurantController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
         }
 
         [HttpGet("tables")]
-        
+
         public async Task<IActionResult> GetAllWithTablesAsync()
         {
             var response = await _service.GetAllWithTablesAsync();

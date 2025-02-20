@@ -18,6 +18,24 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Repositories
         {
             _context = context;
         }
+
+        public async Task<IEnumerable<RestaurantGetAllResponse>> GetAll()
+        {
+           var response = await _context.Restaurants
+           .Select(r => new RestaurantGetAllResponse
+           {
+               Id = r.Id,
+               Name = r.Name,
+               Address = r.Address,
+               PhoneNumber = r.PhoneNumber,
+               Image = r.Image,
+               IsDeleted = r.IsDeleted,
+               CreatedAt = r.CreatedAt
+           })
+           .ToListAsync();
+            return response;
+        }
+
         public async Task<IEnumerable<RestaurantsWithTablesResponse>> GetAllWithTablesAsync()
         {
             List<RestaurantsWithTablesResponse> response = await _context.Restaurants

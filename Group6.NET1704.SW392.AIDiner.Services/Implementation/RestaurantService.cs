@@ -19,6 +19,24 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
         {
             _unitOfWork = unitOfWork;
         }
+
+        public async Task<ResponseDTO> GetAll()
+        {
+            ResponseDTO response = new ResponseDTO();
+            try
+            {
+                response.Data = await _unitOfWork.Restaurants.GetAll();
+                response.IsSucess = true;
+                response.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.BusinessCode = BusinessCode.EXCEPTION;
+            }
+            return response;
+        }
+
         public async Task<ResponseDTO> GetAllWithTablesAsync()
         {
 

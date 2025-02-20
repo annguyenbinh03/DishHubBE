@@ -10,5 +10,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Repositories.Interfaces
     public interface IRestaurantRepository
     {
         Task<IEnumerable<RestaurantsWithTablesResponse>> GetAllWithTablesAsync();
+
+        Task<IEnumerable<RestaurantGetAllResponse>> GetAll();
     }
 }

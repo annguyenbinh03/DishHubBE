@@ -11,5 +11,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
     public interface IRestaurantService
     {
         Task<ResponseDTO> GetAllWithTablesAsync();
+        Task<ResponseDTO> GetAll();
     }
 }
