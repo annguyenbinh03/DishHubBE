@@ -18,8 +18,8 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
         }
         [HttpGet]
         public async Task<ResponseDTO> GetDishesForAdmin(
-            [FromQuery] string? category = null,
-            [FromQuery] int page = 0,
+            [FromQuery] int? category = null,
+            [FromQuery] int page = 1,
             [FromQuery] int size = 10,
             [FromQuery] string? search = null,
             [FromQuery] string? sortBy = null,

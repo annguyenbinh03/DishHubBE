@@ -37,5 +37,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Contract
         Task<bool> ExistsAsync(Expression<Func<T, bool>> filter);
 
         Task<List<Dish>> GetDishesWithIngredients(Expression<Func<Dish, bool>>? filter = null);
+        IQueryable<T> GetQueryable();
+        Task DeleteWhere(Expression<Func<T, bool>> predicate);
     }
 }

@@ -14,10 +14,11 @@ public class UnitOfWork : IUnitOfWork
     public UnitOfWork(DishHub5Context context)
     {
         _context = context;
-        Restaurants = new RestaurantRepository(context);
+        DishIngredientRepository = new GenericRepository<DishIngredient>(_context);
     }
-    
-    
+
+    public IGenericRepository<DishIngredient> DishIngredientRepository { get; private set; }
+
     public async Task<int> SaveChangeAsync()
     {
         return await _context.SaveChangesAsync();

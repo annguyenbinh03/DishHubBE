@@ -20,6 +20,7 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO
         public string Address { get; set; }
         public bool Status { get; set; }
         public string Avatar { get; set; }
+        public bool IsDeleted { get; set; }
     }
 
 

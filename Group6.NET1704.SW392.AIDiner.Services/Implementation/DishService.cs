@@ -13,6 +13,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 {
@@ -42,7 +44,8 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     dto.Data = "Invalid status value. Allowed values: 'onsale', 'inactive'.";
                     return dto;
                 }
-                    var newDish = new Dish
+
+                var newDish = new Dish
                 {
                     Name = createDishDTO.Name,
                     Description = createDishDTO.Description,
@@ -50,6 +53,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Price = createDishDTO.Price,
                     Image = createDishDTO.Image,
                     Status = createDishDTO.Status.ToLower(),
+                    RestaurantId = createDishDTO.RestaurantId,
                     DishIngredients = new List<DishIngredient>()
 
                 };
@@ -109,7 +113,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             try
             {
                 var dishes = await _dishRepository.GetDishesWithIngredients(d => d.Id == dishId);
-                if(dishes.Count == 0)
+                if (dishes.Count == 0)
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.NOT_FOUND;
@@ -120,6 +124,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 {
                     Id = dishData.Id,
                     Name = dishData.Name,
+                    Description = dishData.Description,
                     CategoryId = dishData.CategoryId,
                     Price = dishData.Price,
                     Image = dishData.Image,
@@ -143,35 +148,72 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> GetDishesForAdmin(string? category, int page, int size, string? search, string? sortBy, string? sortOrder)
+        public async Task<ResponseDTO> GetDishesForAdmin(int? categoryId, int page, int size, string? search, string? sortBy, string? sortOrder)
         {
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                Expression<Func<Dish, bool>>? filter = null;
-                if (!string.IsNullOrEmpty(category))
+                var query = _dishRepository
+                    .GetQueryable()
+                    .Include(d => d.Category)
+                    .Include(d => d.DishIngredients)
+                        .ThenInclude(di => di.Ingredient) 
+                    .AsQueryable();
+
+                if (categoryId.HasValue)
                 {
-                    filter = d => d.Category.Name == category;
+                    query = query.Where(d => d.CategoryId == categoryId.Value);
                 }
-                var dishes = await _dishRepository.GetDishesWithIngredients(filter);
-                dto.Data = dishes.Select(d => new DishAdminDTO
+
+                if (!string.IsNullOrEmpty(search))
                 {
-                    Id = d.Id,
-                    Name = d.Name,
-                    Description = d.Description,
-                    CategoryId = d.CategoryId,
-                    Price = d.Price,
-                    Image = d.Image,
-                    SoldCount = d.SoldCount,
-                    Status = d.Status,
-                    Ingredients = d.DishIngredients?.Select(di => new IngredientDTO
+                    query = query.Where(d => EF.Functions.Like(d.Name, $"%{search}%"));
+                }
+
+                query = sortBy?.ToLower() switch
+                {
+                    "name" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(d => d.Name) : query.OrderBy(d => d.Name),
+                    "price" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(d => d.Price) : query.OrderBy(d => d.Price),
+                    "soldcount" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(d => d.SoldCount) : query.OrderBy(d => d.SoldCount),
+                    _ => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(d => d.Id) : query.OrderBy(d => d.Id)
+                };
+
+                int totalItems = await query.CountAsync();
+                int totalPages = (int)Math.Ceiling(totalItems / (double)size);
+
+                var dishes = await query
+                    .Skip((page - 1) * size)
+                    .Take(size)
+                    .ToListAsync();
+
+                dto.Data = new
+                {
+                    TotalPages = totalPages,
+                    CurrentPage = page,
+                    PageSize = size,
+                    Dishes = dishes.Select(d => new DishAdminDTO
                     {
-                        Id = di.Ingredient.Id,
-                        Name = di.Ingredient.Name,
-                        Image = di.Ingredient.Image
+                        Id = d.Id,
+                        Name = d.Name,
+                        Description = d.Description,
+                        CategoryId = d.CategoryId,
+                        Price = d.Price,
+                        Image = d.Image,
+                        SoldCount = d.SoldCount,
+                        Status = d.Status,
+                        Ingredients = d.DishIngredients
+                            .Where(di => di.Ingredient != null) 
+                            .Select(di => new IngredientDTO
+                            {
+                                Id = di.Ingredient!.Id,
+                                Name = di.Ingredient!.Name,
+                                Image = di.Ingredient!.Image
+                            }).ToList()
                     }).ToList()
-                }).ToList();
+                };
+
                 dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
             }
             catch (Exception ex)
             {
@@ -182,12 +224,17 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             return dto;
         }
 
+
         public async Task<ResponseDTO> UpdateDish(int dishId, UpdateDishDTO updateDishDTO)
         {
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                var dish = await _dishRepository.GetById(dishId);
+                var dish = await _dishRepository
+                    .GetQueryable()
+                    .Include(d => d.DishIngredients) //  Load danh sách nguyên liệu hiện tại
+                    .FirstOrDefaultAsync(d => d.Id == dishId);
+
                 if (dish == null)
                 {
                     dto.IsSucess = false;
@@ -195,19 +242,30 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     dto.Data = "Dish not found.";
                     return dto;
                 }
+
+                // Cập nhật thông tin món ăn
                 dish.Name = updateDishDTO.Name ?? dish.Name;
                 dish.Description = updateDishDTO.Description ?? dish.Description;
                 dish.CategoryId = updateDishDTO.CategoryId ?? dish.CategoryId;
                 dish.Price = updateDishDTO.Price ?? dish.Price;
                 dish.Image = updateDishDTO.Image ?? dish.Image;
                 dish.Status = updateDishDTO.Status ?? dish.Status;
-                if (updateDishDTO.Ingredients != null)
+
+                //  Chỉ xóa quan hệ trong DishIngredient, không xóa nguyên liệu thật sự
+                await _unitOfWork.DishIngredientRepository.DeleteWhere(di => di.DishId == dishId);
+                await _unitOfWork.SaveChangeAsync();
+
+                // ✅ Thêm danh sách nguyên liệu mới (nếu có)
+                if (updateDishDTO.Ingredients != null && updateDishDTO.Ingredients.Any())
                 {
-                    dish.DishIngredients.Clear();
-                    foreach (var ingredientId in updateDishDTO.Ingredients)
-                    {
-                        dish.DishIngredients.Add(new DishIngredient { IngredientId = ingredientId });
-                    }
+                    var newIngredients = updateDishDTO.Ingredients
+                        .Select(ingredientId => new DishIngredient
+                        {
+                            DishId = dishId,
+                            IngredientId = ingredientId  // Giữ nguyên Ingredient, chỉ cập nhật quan hệ
+                        }).ToList();
+
+                    await _unitOfWork.DishIngredientRepository.InsertRange(newIngredients);
                 }
                 await _dishRepository.Update(dish);
                 await _unitOfWork.SaveChangeAsync();
@@ -224,5 +282,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             }
             return dto;
         }
+
     }
 }

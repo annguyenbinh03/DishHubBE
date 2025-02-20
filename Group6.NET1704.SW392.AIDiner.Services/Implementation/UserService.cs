@@ -5,10 +5,12 @@ using Group6.NET1704.SW392.AIDiner.Common.UserModel;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
@@ -24,29 +26,55 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ResponseDTO> GetAllUser(int pageNumber, int pageSize)
+        public async Task<ResponseDTO> GetAllUser(int page, int size, string? search, string? sortBy, string? sortOrder)
         {
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                var users = await _userRepository.GetAllDataByExpression(null, pageNumber: pageNumber, pageSize: pageSize, a => a.Role);
+                // Tìm kiếm theo Username hoặc Email
+                var query = _userRepository.GetQueryable().AsQueryable();
 
-                dto.Data = users.Items.Select(u => new UserDTO
+                if (!string.IsNullOrEmpty(search))
                 {
-                    Id = u.Id,
-                    Username = u.Username,
-                    FullName = u.FullName,
-                    Email = u.Email,
-                    Dob = u.Dob,
-                    PhoneNumber = u.PhoneNumber,
-                    RoleId = u.RoleId,
-                    CreateAt = u.CreateAt,
-                    Address = u.Address,
-                   // Status = u.Status,
-                    Avatar = u.Avatar
+                    query = query.Where(u => u.Username.Contains(search) || u.Email.Contains(search));
+                }
 
-                }).ToList();
+                // Xử lý sắp xếp theo nhiều trường khác nhau
+                query = sortBy?.ToLower() switch
+                {
+                    "username" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Username) : query.OrderBy(u => u.Username),
+                    "email" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Email) : query.OrderBy(u => u.Email),
+                    "dob" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Dob) : query.OrderBy(u => u.Dob),
+                    "status" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Status) : query.OrderBy(u => u.Status),
+                    _ => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.CreateAt) : query.OrderBy(u => u.CreateAt) 
+                };
 
+                // Phân trang
+                int totalUsers = await query.CountAsync();
+                int totalPages = (int)Math.Ceiling(totalUsers / (double)size);
+                var users = await query.Skip((page - 1) * size).Take(size).ToListAsync();
+
+                // Trả về kết quả
+                dto.Data = new
+                {
+                    TotalPages = totalPages,
+                    CurrentPage = page,
+                    PageSize = size,
+                    Users = users.Select(u => new UserDTO
+                    {
+                        Id = u.Id,
+                        Username = u.Username,
+                        FullName = u.FullName,
+                        Email = u.Email,
+                        Dob = u.Dob,
+                        PhoneNumber = u.PhoneNumber,
+                        RoleId = u.RoleId,
+                        CreateAt = u.CreateAt,
+                        Address = u.Address,
+                        Status = u.IsDeleted == 0,
+                        Avatar = u.Avatar
+                    }).ToList()
+                };
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
             }
@@ -54,9 +82,11 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Data = ex.Message;
             }
             return dto;
         }
+
         public async Task<ResponseDTO> GetUserById(int id)
         {
             ResponseDTO dto = new ResponseDTO();
