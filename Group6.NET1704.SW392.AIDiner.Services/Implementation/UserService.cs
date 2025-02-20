@@ -45,7 +45,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     "username" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Username) : query.OrderBy(u => u.Username),
                     "email" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Email) : query.OrderBy(u => u.Email),
                     "dob" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Dob) : query.OrderBy(u => u.Dob),
-                    "status" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Status) : query.OrderBy(u => u.Status),
+                    //"status" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Status) : query.OrderBy(u => u.Status),
                     _ => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.CreateAt) : query.OrderBy(u => u.CreateAt) 
                 };
 
@@ -71,7 +71,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         RoleId = u.RoleId,
                         CreateAt = u.CreateAt,
                         Address = u.Address,
-                        Status = u.IsDeleted == 0,
+                        Status = u.IsDeleted == false,
                         Avatar = u.Avatar
                     }).ToList()
                 };
