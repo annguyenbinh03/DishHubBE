@@ -94,7 +94,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     CategoryId = d.CategoryId,
                     Price = d.Price,
                     Image = d.Image,
-                    //Status = d.Status,
+                    RestaurantId = d.RestaurantId,
                 }).ToList();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
@@ -255,7 +255,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 await _unitOfWork.DishIngredientRepository.DeleteWhere(di => di.DishId == dishId);
                 await _unitOfWork.SaveChangeAsync();
 
-                // ✅ Thêm danh sách nguyên liệu mới (nếu có)
                 if (updateDishDTO.Ingredients != null && updateDishDTO.Ingredients.Any())
                 {
                     var newIngredients = updateDishDTO.Ingredients
