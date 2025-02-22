@@ -16,6 +16,8 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO.AdminDTO
         public string Image {  get; set; }
         public int SoldCount { get; set; }
         public string Status { get; set; }
+        public int? RestaurantId { get; set; }
+        public string? RestaurantName { get; set; } 
         public List<IngredientDTO> Ingredients { get; set; }
     }
 }

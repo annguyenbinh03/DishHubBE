@@ -15,5 +15,6 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO
         public string? Image {  get; set; }
         public string? Status { get; set; }
         public List<int>? Ingredients { get; set; }
+        public int? RestaurantId { get; set; }
     }
 }

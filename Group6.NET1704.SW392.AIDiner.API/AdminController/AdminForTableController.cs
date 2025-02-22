@@ -1,6 +1,9 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.Common.DTO.AdminDTO;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.Request;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Group6.NET1704.SW392.AIDiner.Services.Implementation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,6 +38,11 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
         {
             return await _service.CreateTableForAdmin(createTableDTO);
 
+        }
+        [HttpPut("{id}")]
+        public async Task<ResponseDTO> UpdateTable(int id, [FromBody] UpdateTableRequest updateRequest)
+        {
+            return await _service.UpdateTableForAdmin(id, updateRequest);
         }
     }
 }
