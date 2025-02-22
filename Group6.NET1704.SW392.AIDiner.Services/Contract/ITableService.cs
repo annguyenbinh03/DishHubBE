@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.AdminDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
 {
     public interface ITableService
     {
-        public Task<ResponseDTO> GetAllTable();
+        //public Task<ResponseDTO> GetAllTable();
+        public Task<ResponseDTO> GetAllTableForAdmin();
+        public Task<ResponseDTO> CreateTableForAdmin(CreateTableForAdminDTO createTableDTO);
     }
 }

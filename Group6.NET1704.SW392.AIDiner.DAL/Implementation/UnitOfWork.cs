@@ -11,10 +11,11 @@ public class UnitOfWork : IUnitOfWork
 
     public IRestaurantRepository Restaurants { get; private set; }
 
-    public UnitOfWork(DishHub5Context context)
+    public UnitOfWork(DishHub5Context context, IRestaurantRepository restaurantRepository)
     {
         _context = context;
         DishIngredientRepository = new GenericRepository<DishIngredient>(_context);
+        Restaurants = restaurantRepository;
     }
 
     public IGenericRepository<DishIngredient> DishIngredientRepository { get; private set; }

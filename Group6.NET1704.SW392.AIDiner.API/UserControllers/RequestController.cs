@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
 {
-    [Route("api/request")]
+    [Route("api/requests")]
     [ApiController]
     public class RequestController : ControllerBase
     {
@@ -27,6 +27,11 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
         public async Task<ResponseDTO> GetAllRequest()
         {
             return await _requestService.GetAllRequest();
+        }
+        [HttpPost]
+        public async Task<ResponseDTO> CreateRequest(CreateRequestDTO requestDto)
+        {
+            return await _requestService.CreateRequest(requestDto);
         }
     }
 }

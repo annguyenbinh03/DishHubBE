@@ -16,10 +16,10 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
             _service = service;
         }
 
-        [HttpGet]
-        public async Task<ResponseDTO> GetAllTable()
-        {
-            return await _service.GetAllTable();
-        }
+        //[HttpGet]
+        //public async Task<ResponseDTO> GetAllTable()
+        //{
+        //    return await _service.GetAllTable();
+        //}
     }
 }
