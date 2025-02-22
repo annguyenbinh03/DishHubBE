@@ -10,6 +10,8 @@ using Group6.NET1704.SW392.AIDiner.Services.Implementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Group6.NET1704.SW392.AIDiner.DAL.Repositories.Interfaces;
+using Group6.NET1704.SW392.AIDiner.DAL.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,8 +25,13 @@ builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
 
-
+builder.Services.AddScoped<GeminiService>(provider =>
+{
+    string apiKey = builder.Configuration["Gemini:Key"];
+    return new GeminiService(apiKey);
+});
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
@@ -151,11 +158,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Cấu hình pipeline của ứng dụng
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 // Áp dụng CORS
 app.UseCors("AllowAll");
 
