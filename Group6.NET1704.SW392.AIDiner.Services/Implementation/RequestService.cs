@@ -16,6 +16,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 {
     public class RequestService : IRequestService
     {
+        private IUnitOfWork _unitOfWork;
         private IGenericRepository<Request> _requestRepository;
         private IGenericRepository<Order> _orderRepository;
         private IGenericRepository<RequestType> _requestTypeRepository;
