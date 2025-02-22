@@ -14,6 +14,7 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO.Request
         public int? CategoryId { get; set; }
         public decimal Price { get; set; }
         public string Image { get; set; }
+        public int RestaurantId { get; set; }
 
     }
 }

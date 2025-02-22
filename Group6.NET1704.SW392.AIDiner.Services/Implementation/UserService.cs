@@ -31,7 +31,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                // Tìm kiếm theo Username hoặc Email
                 var query = _userRepository.GetQueryable().AsQueryable();
 
                 if (!string.IsNullOrEmpty(search))
@@ -39,22 +38,18 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     query = query.Where(u => u.Username.Contains(search) || u.Email.Contains(search));
                 }
 
-                // Xử lý sắp xếp theo nhiều trường khác nhau
                 query = sortBy?.ToLower() switch
                 {
                     "username" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Username) : query.OrderBy(u => u.Username),
                     "email" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Email) : query.OrderBy(u => u.Email),
                     "dob" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Dob) : query.OrderBy(u => u.Dob),
-                    //"status" => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.Status) : query.OrderBy(u => u.Status),
-                    _ => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.CreateAt) : query.OrderBy(u => u.CreateAt) 
+                    _ => sortOrder?.ToLower() == "desc" ? query.OrderByDescending(u => u.CreateAt) : query.OrderBy(u => u.CreateAt)
                 };
 
-                // Phân trang
                 int totalUsers = await query.CountAsync();
                 int totalPages = (int)Math.Ceiling(totalUsers / (double)size);
                 var users = await query.Skip((page - 1) * size).Take(size).ToListAsync();
 
-                // Trả về kết quả
                 dto.Data = new
                 {
                     TotalPages = totalPages,
@@ -71,7 +66,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         RoleId = u.RoleId,
                         CreateAt = u.CreateAt,
                         Address = u.Address,
-                        Status = u.IsDeleted == false,
+                        Status = !u.IsDeleted,
                         Avatar = u.Avatar
                     }).ToList()
                 };
@@ -86,6 +81,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             }
             return dto;
         }
+
 
         public async Task<ResponseDTO> GetUserById(int id)
         {
