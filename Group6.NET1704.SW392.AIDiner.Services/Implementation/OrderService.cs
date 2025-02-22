@@ -61,6 +61,48 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             return dto;
         }
 
+        public async Task<ResponseDTO> CreateOrderByTable(CreateOrderByTableDTO request)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                if (request == null || request.TableId <= 0)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.INVALID_INPUT;
+                    dto.message = "Invalid table ID";
+                    return dto;
+                }
+
+                Order newOrder = new Order
+                {
+                    TableId = request.TableId,
+                    TotalAmount = 0,
+                    //PaymentStatus = 0, // Default payment status
+                    CreatedAt = DateTime.UtcNow,
+                    Status = "pending"
+                };
+
+                await _orderRepository.Insert(newOrder);
+                await _unitOfWork.SaveChangeAsync();
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.CREATE_SUCCESS;
+                dto.message = "Order created successfully";
+                dto.Data = new OrderByTableDTO
+                {
+                    OrderId = newOrder.Id
+                };
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.message = "Error" + ex.Message;
+            }
+            return dto;
+        }
+
         public async Task<ResponseDTO> GetAllOrder()
         {
             ResponseDTO dto = new ResponseDTO();
