@@ -171,7 +171,13 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 dto.Data = new
                 {
                     OrderId = orderId,
-                    OrderDetails = orderDetails
+                    OrderDetails = orderDetails.Select(od => new
+                    {
+                        DishId = od.DishId,
+                        Quantity = od.Quantity,
+                        Price = od.Price,
+                        Status = od.Status
+                    }).ToList()
                 };
             }
             catch (Exception)

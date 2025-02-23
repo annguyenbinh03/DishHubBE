@@ -23,7 +23,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
             return Ok(response);
         }
 
-        [HttpPost("{id}/details")]
+        [HttpPost("orders/{id}/details")]
         public async Task<IActionResult> AddDishToOrder([FromRoute] int id, [FromBody] List<DishRequestDTO> dishes)
         {
             var response = await _orderDetailService.AddDishToOrder(id, dishes);
