@@ -22,13 +22,13 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
         {
             return await _orderService.GetByOrderId(id);
         }
-
+        ///
+        //[HttpPost]
+        //public async Task<ResponseDTO> CreateOrder(CreateOrderDTO request)
+        //{
+        //    return await _orderService.CreateOrder(request);
+        //}
         [HttpPost]
-        public async Task<ResponseDTO> CreateOrder(CreateOrderDTO request)
-        {
-            return await _orderService.CreateOrder(request);
-        }
-        [HttpPost("table")]
         public async Task<ResponseDTO> CreateOrderByTable(CreateOrderByTableDTO request)
         {
             return await _orderService.CreateOrderByTable(request);
