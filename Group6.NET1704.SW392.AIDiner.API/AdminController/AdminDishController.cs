@@ -32,10 +32,11 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
         {
             return await _dishService.CreateDish(createDishDTO);
         }
-        [HttpPut]
-        public async Task<ResponseDTO> UpdateDish (int id, [FromBody] UpdateDishDTO updateDishDTO)
+        [HttpPut("{id}")]
+        public async Task<ResponseDTO> UpdateDish(int id, [FromBody] UpdateDishDTO updateDishDTO)
         {
             return await _dishService.UpdateDish(id, updateDishDTO);
         }
+
     }
 }

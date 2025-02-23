@@ -122,6 +122,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         var entities = _context.Set<T>().Where(predicate);
         _context.Set<T>().RemoveRange(entities);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(); 
     }
+
+
 }

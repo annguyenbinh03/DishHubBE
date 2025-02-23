@@ -5,6 +5,7 @@ using Group6.NET1704.SW392.AIDiner.Common.DTO.Request;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -160,6 +161,54 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             return dto;
         }
 
+        public async Task<ResponseDTO> UpdateTableForAdmin(int id, UpdateTableRequest updateRequest)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                var table = await _tableRepository.GetQueryable()
+                    .Include(t => t.Restaurant)
+                    .FirstOrDefaultAsync(t => t.Id == id);
 
+                if (table == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.NOT_FOUND;
+                    dto.Data = "Table not found";
+                    return dto;
+                }
+
+                // Cập nhật thông tin nếu có thay đổi
+                if (!string.IsNullOrEmpty(updateRequest.Name)) table.Name = updateRequest.Name;
+                if (!string.IsNullOrEmpty(updateRequest.Description)) table.Description = updateRequest.Description;
+                if (updateRequest.RestaurantId.HasValue) table.RestaurantId = updateRequest.RestaurantId.Value;
+                if (updateRequest.IsDeleted.HasValue) table.IsDeleted = updateRequest.IsDeleted.Value;
+
+                await _tableRepository.Update(table);
+                await _unitOfWork.SaveChangeAsync();
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.UPDATE_SUCESSFULLY;
+                dto.Data = new
+                {
+                    table.Id,
+                    table.Name,
+                    table.Description,
+                    CreatedAt = table.CreatedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
+                    table.IsDeleted,
+                    table.RestaurantId,
+                    RestaurantName = table.Restaurant?.Name,
+                    RestaurantImage = table.Restaurant?.Image
+                };
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Data = ex.Message;
+            }
+            return dto;
+        }
     }
-}
+    }
+

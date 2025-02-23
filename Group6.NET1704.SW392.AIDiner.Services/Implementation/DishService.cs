@@ -23,12 +23,14 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
         private IGenericRepository<Dish> _dishRepository;
         private IUnitOfWork _unitOfWork;
         private IGenericRepository<Ingredient> _ingredientRepository;
+        private IGenericRepository<Restaurant> _restaurantRepository;
 
-        public DishService(IGenericRepository<Dish> dishRepository, IUnitOfWork unitOfWork, IGenericRepository<Ingredient> ingredientRepository)
+        public DishService(IGenericRepository<Dish> dishRepository, IUnitOfWork unitOfWork, IGenericRepository<Ingredient> ingredientRepository, IGenericRepository<Restaurant> restaurantRepository)
         {
             _dishRepository = dishRepository;
             _unitOfWork = unitOfWork;
             _ingredientRepository = ingredientRepository;
+            _restaurantRepository = restaurantRepository;
         }
 
         public async Task<ResponseDTO> CreateDish(CreateDishDTO createDishDTO)
@@ -157,7 +159,8 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     .GetQueryable()
                     .Include(d => d.Category)
                     .Include(d => d.DishIngredients)
-                        .ThenInclude(di => di.Ingredient) 
+                    .ThenInclude(di => di.Ingredient)
+                    .Include(d => d.Restaurant)
                     .AsQueryable();
 
                 if (categoryId.HasValue)
@@ -201,8 +204,10 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         Image = d.Image,
                         SoldCount = d.SoldCount,
                         Status = d.Status,
+                        RestaurantId = d.RestaurantId,
+                        RestaurantName = d.Restaurant.Name,
                         Ingredients = d.DishIngredients
-                            .Where(di => di.Ingredient != null) 
+                            .Where(di => di.Ingredient != null)
                             .Select(di => new IngredientDTO
                             {
                                 Id = di.Ingredient!.Id,
@@ -224,15 +229,17 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             return dto;
         }
 
-
         public async Task<ResponseDTO> UpdateDish(int dishId, UpdateDishDTO updateDishDTO)
         {
+            Console.WriteLine($"UpdateDish called with dishId: {dishId}");
             ResponseDTO dto = new ResponseDTO();
             try
             {
                 var dish = await _dishRepository
                     .GetQueryable()
-                    .Include(d => d.DishIngredients) //  Load danh sách nguyên liệu hiện tại
+                    .Include(d => d.DishIngredients)
+                    .ThenInclude(di => di.Ingredient)
+                    .Include(d => d.Restaurant)
                     .FirstOrDefaultAsync(d => d.Id == dishId);
 
                 if (dish == null)
@@ -243,44 +250,73 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     return dto;
                 }
 
-                // Cập nhật thông tin món ăn
                 dish.Name = updateDishDTO.Name ?? dish.Name;
                 dish.Description = updateDishDTO.Description ?? dish.Description;
                 dish.CategoryId = updateDishDTO.CategoryId ?? dish.CategoryId;
                 dish.Price = updateDishDTO.Price ?? dish.Price;
                 dish.Image = updateDishDTO.Image ?? dish.Image;
                 dish.Status = updateDishDTO.Status ?? dish.Status;
+                var existingIngredients = await _unitOfWork.DishIngredientRepository
+                    .GetQueryable()
+                    .Where(di => di.DishId == dishId)
+                    .ToListAsync();
 
-                //  Chỉ xóa quan hệ trong DishIngredient, không xóa nguyên liệu thật sự
+                // Xóa nguyên liệu cũ
                 await _unitOfWork.DishIngredientRepository.DeleteWhere(di => di.DishId == dishId);
-                await _unitOfWork.SaveChangeAsync();
-
+                await _unitOfWork.SaveChangeAsync();  // Commit xóa nguyên liệu cũ trước khi thêm mới
+                var checkAfterDelete = await _unitOfWork.DishIngredientRepository
+                .GetQueryable()
+                .Where(di => di.DishId == dishId)
+                .ToListAsync();
                 if (updateDishDTO.Ingredients != null && updateDishDTO.Ingredients.Any())
                 {
                     var newIngredients = updateDishDTO.Ingredients
                         .Select(ingredientId => new DishIngredient
                         {
                             DishId = dishId,
-                            IngredientId = ingredientId  // Giữ nguyên Ingredient, chỉ cập nhật quan hệ
+                            IngredientId = ingredientId
                         }).ToList();
 
                     await _unitOfWork.DishIngredientRepository.InsertRange(newIngredients);
+                    await _unitOfWork.SaveChangeAsync();
                 }
+
                 await _dishRepository.Update(dish);
                 await _unitOfWork.SaveChangeAsync();
 
+                Console.WriteLine("Dish updated successfully");
+
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.UPDATE_SUCESSFULLY;
-                dto.Data = new { dish.Id, dish.Name };
+                dto.Data = new
+                {
+                    dish.Id,
+                    dish.Name,
+                    dish.Description,
+                    dish.CategoryId,
+                    dish.Price,
+                    dish.Image,
+                    dish.Status,
+                    Ingredient = dish.DishIngredients.Where(di => di.Ingredient != null).Select(di => new
+                    {
+                        di.Ingredient.Id,
+                        di.Ingredient.Name,
+                        di.Ingredient.Image
+                    }).ToList(),
+                    dish.RestaurantId,
+                    RestaurantName = dish.Restaurant?.Name
+                };
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Exception: {ex.Message}");
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
-                dto.Data = ex.Message;
+                dto.Data = $"Exception: {ex.Message}";
             }
             return dto;
         }
+
 
     }
 }
