@@ -1,14 +1,18 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.Request;
 using Group6.NET1704.SW392.AIDiner.Common.Model.RegisterLoginModel;
+using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Group6.NET1704.SW392.AIDiner.Services.Implementation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Group6.NET1704.SW392.AIDiner.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthenController : ControllerBase
     {
@@ -19,7 +23,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
             _authenService = authenService;
         }
 
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO model)
         {
             if (model == null || string.IsNullOrEmpty(model.UserName) || string.IsNullOrEmpty(model.Password))
@@ -35,7 +39,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
             return Ok(new { Token = token, message = "Login successful" });
         }
 
-        [HttpPost("Register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterLoginModel model)
         {
             if (!ModelState.IsValid)
@@ -107,6 +111,14 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
             };
 
             return Ok(userInfo);
+        }
+
+        [HttpPost("login-google")]
+        public async Task<IActionResult> LoginGoogle([FromBody] GoogleAuthRequest model)
+        {
+            var response = await _authenService.LoginGoogle(model);
+
+            return Ok(response);
         }
     }
 }

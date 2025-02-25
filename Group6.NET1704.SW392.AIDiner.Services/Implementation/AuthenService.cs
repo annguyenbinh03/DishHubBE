@@ -3,12 +3,16 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Google.Apis.Auth;
 using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.Request;
 using Group6.NET1704.SW392.AIDiner.Common.Model.RegisterLoginModel;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Group6.NET1704.SW392.AIDiner.Services.Implementation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -39,13 +43,13 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Services
             }
 
             var user = await _userRepository.GetByExpression(
-                u => u.Username == model.UserName /*&& u.Status == true*/ && u.Password == model.Password,
+                u => u.Username == model.UserName,
                 u => u.Role);
 
-            //if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
-            //{
-            //    return null;
-            //}
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
+            {
+                return null;
+            }
 
             var claims = new[]
             {
@@ -126,7 +130,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Services
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -152,6 +156,36 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Services
         public bool IsTokenRevoked(string token)
         {
             return RevokedTokens.Contains(token);
+        }
+
+        public async Task<ResponseDTO> LoginGoogle(GoogleAuthRequest request)
+        {
+            ResponseDTO response = new ResponseDTO();
+            try
+            {
+                // Xác thực token với Google
+                var payload = await GoogleJsonWebSignature.ValidateAsync(request.Token);
+
+                // Kiểm tra người dùng có trong database không
+                var user = await _unitOfWork.Users.FindUserByEmailAsync(payload.Email);
+                if (user == null)
+                {
+                    // Nếu chưa có, có thể tạo tài khoản mới hoặc từ chối
+                    user = await _unitOfWork.Users.CreateUserAsync(payload.Email, payload.Name);
+                }
+
+                // Tạo JWT token của hệ thống cho user
+                string token = GenerateJwtToken(user);
+
+                response.Data = new { token };
+              
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.BusinessCode = BusinessCode.EXCEPTION;
+            }
+            return response;
         }
     }
 }

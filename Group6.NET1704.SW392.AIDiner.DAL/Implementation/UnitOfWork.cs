@@ -9,13 +9,17 @@ public class UnitOfWork : IUnitOfWork
     private readonly DishHub5Context _context;
 
     public IRestaurantRepository Restaurants { get; private set; }
+
+    public IUserRepository Users { get; private set; }
+
     public IGenericRepository<DishIngredient> DishIngredientRepository { get; private set; }
 
-    public UnitOfWork(DishHub5Context context, IRestaurantRepository restaurantRepository)
+    public UnitOfWork(DishHub5Context context, IRestaurantRepository restaurantRepository, IUserRepository userRepository)
     {
         _context = context;
         DishIngredientRepository = new GenericRepository<DishIngredient>(_context);
         Restaurants = restaurantRepository;
+        Users = userRepository;
     }
 
     public async Task<int> SaveChangeAsync()
