@@ -24,5 +24,18 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
             return await _categoryService.CreateCategoryForAdmin(createDishCategoryForAdminDTO);
         }
 
+        [HttpPut("dish-categories/{id}")]
+        public async Task<IActionResult> UpdateCategoryForAdmin(int id, [FromBody] UpdateCategoryForAdminDTO updateDTO)
+        {
+            var dto = await _categoryService.UpdateCategoryForAdmin(id, updateDTO);
+            return Ok(dto);
+        }
+
+        [HttpDelete("dish-categories/{id}")]
+        public async Task<ResponseIsSucessDTO> DeleteCategoryForAdmin(int id)
+        {
+           return await _categoryService.DeleteCategoryForAdmin(id);
+            
+        }
     }
 }

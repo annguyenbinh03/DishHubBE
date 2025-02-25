@@ -13,6 +13,9 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
     {
         public Task<ResponseDTO> GetAllCategory();
         public Task<ResponseDTO> CreateCategoryForAdmin(CreateDishCategoryForAdminDTO createDishCategoryForAdminDTO);
+        public Task<ResponseDTO> UpdateCategoryForAdmin(int id,UpdateCategoryForAdminDTO updateDTO);
+        public Task<ResponseIsSucessDTO> DeleteCategoryForAdmin(int id);
+
 
     }
 }
