@@ -11,6 +11,7 @@ using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using System.Linq.Expressions;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Common.DTO.Request;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.AdminDTO;
 
 namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 {
@@ -23,6 +24,37 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
         {
             _categoryRepositoy = categoryRepositoy;
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<ResponseDTO> CreateCategoryForAdmin(CreateDishCategoryForAdminDTO createDishCategoryForAdminDTO)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+
+                var newCategory = new Category
+                {
+                    Name = createDishCategoryForAdminDTO.Name,
+                };
+
+                await _categoryRepositoy.Insert(newCategory);
+                await _unitOfWork.SaveChangeAsync();
+
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.CREATE_SUCCESS;
+                dto.Data = new { newCategory.Id, newCategory.Name, newCategory.IsDeleted};
+                dto.message = "Create Dish-Category Successfully";
+
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.message = "Error" + ex.Message;
+            }
+            return dto;
+
         }
 
         public async Task<ResponseDTO> GetAllCategory()

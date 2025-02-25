@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.AdminDTO;
 using Group6.NET1704.SW392.AIDiner.Common.DTO.Request;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using System;
