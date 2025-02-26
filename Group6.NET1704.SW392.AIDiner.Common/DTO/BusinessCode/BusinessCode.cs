@@ -20,4 +20,5 @@ public enum BusinessCode
     PHONE_ALREADY_EXISTS = 2112,
     CREATE_SUCCESS = 2008,
     INVALID_INPUT = 2009,
+    DELETE_SUCCESS = 2010,
 }
