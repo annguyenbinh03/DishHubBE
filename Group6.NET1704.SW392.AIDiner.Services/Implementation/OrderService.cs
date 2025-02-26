@@ -16,11 +16,14 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
     {
 
         private IGenericRepository<Order> _orderRepository;
+        private IGenericRepository<Dish> _dishRepository;
+
         private IUnitOfWork _unitOfWork;
 
-        public OrderService(IGenericRepository<Order> orderRepository, IUnitOfWork unitOfWork)
+        public OrderService(IGenericRepository<Order> orderRepository, IGenericRepository<Dish> dishRepository, IUnitOfWork unitOfWork)
         {
             _orderRepository = orderRepository;
+            _dishRepository = dishRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -29,13 +32,13 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                if (request == null || request.CustomerId <= 0 || request.TableId <= 0 || request.TotalAmount <=0)
+                if (request == null || request.CustomerId <= 0 || request.TableId <= 0 || request.TotalAmount <= 0)
                 {
                     dto.IsSucess = false;
-                    dto.BusinessCode=BusinessCode.INVALID_INPUT;
+                    dto.BusinessCode = BusinessCode.INVALID_INPUT;
                     return dto;
                 }
-                Order newOrder = new Order  
+                Order newOrder = new Order
                 {
                     //CustomerId = request.CustomerId,
                     TableId = request.TableId,
@@ -56,7 +59,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             catch (Exception ex)
             {
                 dto.IsSucess = false;
-                dto.BusinessCode=BusinessCode.EXCEPTION;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
             }
             return dto;
         }
@@ -131,58 +134,65 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             }
             return dto;
         }
-
         public async Task<ResponseDTO> GetByOrderId(int id)
         {
             ResponseDTO dto = new ResponseDTO();
             try
             {
                 var order = await _orderRepository.GetAllDataByExpression(
-                    filter: o => o.Id == id,0, 0,
-                    includes: new Expression<Func<Order, object>>[]
-                    {
-                o => o.Table });
+                filter: o => o.Id == id, 0, 0,
+                includes: new Expression<Func<Order, object>>[]
+                {
+                    o => o.Table,
+                    o => o.OrderDetails
+                });
 
                 var orderData = order.Items.FirstOrDefault();
-                if (orderData == null)
+
+                if (orderData != null && orderData.OrderDetails != null)
                 {
-                    dto.IsSucess = false;
-                    return dto;
+                    foreach (var detail in orderData.OrderDetails)
+                    {
+                        detail.Dish = await _dishRepository.GetById(detail.DishId);
+                    }
                 }
+
+                var dishes = orderData.OrderDetails != null && orderData.OrderDetails.Any()
+                    ? orderData.OrderDetails
+                        .Select(d => new Order_OrderDetailDTO
+                        {
+                            Id = d.Id,
+                            Name = d.Dish.Name,
+                            Image = d.Dish.Image,
+                            Price = d.Price,
+                            Quantity = d.Quantity,
+                            Status = d.Status
+                        }).ToList()
+                    : new List<Order_OrderDetailDTO>();
 
                 dto.Data = new OrderDTO
                 {
                     Id = orderData.Id,
                     TableId = orderData.TableId,
-                    TableName = orderData.Table.Name,
-
+                    TableName = orderData.Table?.Name ?? "Unknown Table",
                     TotalAmount = orderData.TotalAmount,
                     PaymentStatus = orderData.PaymentStatus,
-                    CreatedAt = orderData.CreatedAt,
                     Status = orderData.Status,
-
-
-
-                    //    TableName = new TableForOrderDTO
-                    //    {
-                    //        TableName = orderData.Table.Name,
-
-                    //    }
+                    Dishes = dishes
                 };
 
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
-                dto.message = "Get Order by ID successfully";
+                dto.message = "Get Detail Order Successfully.";
             }
             catch (Exception ex)
             {
                 dto.IsSucess = false;
                 dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.message = "Error: " + ex.Message;
             }
             return dto;
         }
-
-
 
     }
 }
