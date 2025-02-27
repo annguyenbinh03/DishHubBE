@@ -3,6 +3,7 @@ using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +17,14 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
     {
 
         private IGenericRepository<Order> _orderRepository;
-        private IGenericRepository<Dish> _dishRepository;
+        private IGenericRepository<OrderDetail> _orderDetailRepository;
 
         private IUnitOfWork _unitOfWork;
 
-        public OrderService(IGenericRepository<Order> orderRepository, IGenericRepository<Dish> dishRepository, IUnitOfWork unitOfWork)
+        public OrderService(IGenericRepository<Order> orderRepository, IGenericRepository<OrderDetail> orderDetailRepository, IUnitOfWork unitOfWork)
         {
             _orderRepository = orderRepository;
-            _dishRepository = dishRepository;
+            _orderDetailRepository = orderDetailRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -184,6 +185,86 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.message = "Get Detail Order Successfully.";
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.message = "Error: " + ex.Message;
+            }
+            return dto;
+        }
+
+
+        public async Task<ResponseDTO> UpdateOrderByAdmin(int orderId, UpdateOrderDTO request)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                var order = await _orderRepository.GetQueryable()
+                    .Include(o => o.Table)
+                    .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Dish)
+                    .FirstOrDefaultAsync(o => o.Id == orderId);
+
+                if (order == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.NOT_FOUND;
+                    dto.message = "Order not found";
+                    return dto;
+                }
+
+                // Cập nhật thông tin cơ bản của đơn hàng
+                order.TableId = request.TableId;
+                order.PaymentStatus = request.PaymentStatus;
+                order.Status = request.Status;
+
+                await _orderDetailRepository.DeleteWhere(od => od.OrderId == orderId);
+
+                // Thêm orderDetail mới
+                List<OrderDetail> newOrderDetails = new List<OrderDetail>();
+                foreach (var dish in request.Dishes)
+                {
+                    newOrderDetails.Add(new OrderDetail
+                    {
+                        OrderId = orderId,
+                        DishId = dish.DishId,
+                        Quantity = dish.Quantity,
+                        Price = dish.Price,
+                        Status = dish.Status
+                    });
+                }
+                await _orderDetailRepository.InsertRange(newOrderDetails);
+                order.TotalAmount = newOrderDetails.Sum(d => d.Price * d.Quantity);
+                await _unitOfWork.SaveChangeAsync();
+                // Lưu thay đổi vào database
+                await _unitOfWork.SaveChangeAsync();
+
+                var updatedOrder = new UpdateOrderResponseDTO
+                {
+                    Id = order.Id,
+                    TableId = order.TableId.ToString(),
+                    TableName = order.Table != null ? order.Table.Name : "Unknown Table",
+                    TotalAmount = order.OrderDetails.Sum(od => od.Price * od.Quantity),
+                    PaymentStatus = order.PaymentStatus,
+                    Status = order.Status,
+                    Dishes = newOrderDetails.Select(d => new OrderDetailResponseDTO
+                    {
+                        Id = d.Id, // Đảm bảo lấy đúng id của OrderDetail
+                        Name = d.Dish != null ? d.Dish.Name : "Unknown Dish",
+                        Image = d.Dish != null ? d.Dish.Image : "No Image",
+                        Price = d.Price,
+                        Quantity = d.Quantity,
+                        Status = d.Status
+                    }).ToList()
+                };
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.UPDATE_SUCESSFULLY;
+                dto.message = "Order updated successfully";
+                dto.Data = updatedOrder;
+
             }
             catch (Exception ex)
             {

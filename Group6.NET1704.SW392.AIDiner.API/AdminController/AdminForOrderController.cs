@@ -22,6 +22,13 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
             return await _orderService.GetAllOrder();
         }
 
-      
+
+        [HttpPut("orders")]
+        public async Task<ResponseDTO> UpdateOrderByAdmin(int orderId, UpdateOrderDTO request)
+        {
+            return await _orderService.UpdateOrderByAdmin(orderId, request);
+        }
+
+
     }
 }
