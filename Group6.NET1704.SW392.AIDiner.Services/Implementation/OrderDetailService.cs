@@ -188,5 +188,52 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
             return dto;
         }
+
+        public async Task<ResponseDTO> ChangeStatus(int orderDetailId, string status)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                OrderDetail? orderDetail = await _orderDetailRepositoy.GetById(orderDetailId);
+                if (orderDetail == null) {
+                    throw new Exception("not found order detail with orderDetaiId: " + orderDetailId);
+                }
+
+                if(orderDetail.Status == "pending")
+                {
+                    if (status == "confirmed" || status == "rejected")
+                        orderDetail.Status = status;
+                    else
+                        throw new Exception("Status only can change from pending to confirmed or rejected");
+                }
+
+                if (orderDetail.Status == "confirmed")
+                {
+                    if (status == "preparing" || status == "rejected")
+                        orderDetail.Status = status;
+                    else
+                        throw new Exception("Status only can change from confirmed to preparing or rejected");
+                }
+
+
+                if (orderDetail.Status == "preparing")
+                {
+                    if (status == "delivered" || status == "rejected")
+                        orderDetail.Status = status;
+                    else
+                        throw new Exception("Status only can change from preparing to delivered or rejected");
+                }
+
+                dto.IsSucess = true;
+            }
+            catch (Exception e)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.message = e.Message;
+            }
+
+            return dto;
+        }
     }
 }

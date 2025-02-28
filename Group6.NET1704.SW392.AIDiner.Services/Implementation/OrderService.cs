@@ -18,14 +18,16 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
         private IGenericRepository<Order> _orderRepository;
         private IGenericRepository<OrderDetail> _orderDetailRepository;
+        private IGenericRepository<Dish> _dishRepository;
 
         private IUnitOfWork _unitOfWork;
 
-        public OrderService(IGenericRepository<Order> orderRepository, IGenericRepository<OrderDetail> orderDetailRepository, IUnitOfWork unitOfWork)
+        public OrderService(IGenericRepository<Order> orderRepository, IGenericRepository<OrderDetail> orderDetailRepository, IGenericRepository<Dish> dishRepository, IUnitOfWork unitOfWork)
         {
             _orderRepository = orderRepository;
             _orderDetailRepository = orderDetailRepository;
             _unitOfWork = unitOfWork;
+            _dishRepository = dishRepository;
         }
 
         public async Task<ResponseDTO> CreateOrder(CreateOrderDTO request)

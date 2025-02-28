@@ -29,5 +29,12 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
             var response = await _orderDetailService.AddDishToOrder(id, dishes);
             return Ok(response);
         }
+
+        [HttpPatch("orders/details/{id}")]
+        public async Task<IActionResult> ChangeStatus([FromRoute] int id, [FromBody] string status)
+        {
+            var response = await _orderDetailService.ChangeStatus(id, status);
+            return Ok(response);
+        }
     }
 }

@@ -11,6 +11,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
     {
         public Task<ResponseDTO> GetOrderDetailByOrderID(int orderId);
         public Task<ResponseDTO> AddDishToOrder(int orderId, List<DishRequestDTO> dishes);
-
+        public Task<ResponseDTO> ChangeStatus(int orderDetailId, string status);
     }
 }
