@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.Request;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,9 +32,9 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
         }
 
         [HttpPatch("orders/details/{id}")]
-        public async Task<IActionResult> ChangeStatus([FromRoute] int id, [FromBody] string status)
+        public async Task<IActionResult> ChangeStatus([FromRoute] int id, [FromBody] ChangeOrderDetailStatusRequest request)
         {
-            var response = await _orderDetailService.ChangeStatus(id, status);
+            var response = await _orderDetailService.ChangeStatus(id, request.status);
             return Ok(response);
         }
     }
