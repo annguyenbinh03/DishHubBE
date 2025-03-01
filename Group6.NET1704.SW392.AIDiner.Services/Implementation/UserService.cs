@@ -125,11 +125,11 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> UpdateUserForAdmin(UpdateUserModel userDTO)
+        public async Task<ResponseDTO> UpdateUserForAdmin(int id, UpdateUserModel userDTO)
         {
             try
             {
-                var existingUser = await _userRepository.GetById(userDTO.Id);
+                var existingUser = await _userRepository.GetById(id);
                 if (existingUser == null)
                 {
                     return new ResponseDTO
@@ -167,7 +167,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     BusinessCode = BusinessCode.UPDATE_SUCESSFULLY,
                     Data = new UpdateUserModel
                     {
-                        Id = existingUser.Id,
+                        //Id = existingUser.Id,
                         Username = existingUser.Username,
                         FullName = existingUser.FullName,
                         Email = existingUser.Email,

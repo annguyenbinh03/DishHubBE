@@ -33,11 +33,10 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
             return await _service.GetUserById(id);
         }
 
-        [HttpPut("/users")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ResponseDTO> UpdateUser([FromBody] UpdateUserModel userDTO)
+        [HttpPut("users/{id}")]
+        public async Task<ResponseDTO> UpdateUser(int id, [FromBody] UpdateUserModel userDTO)
         {
-            return await _service.UpdateUserForAdmin(userDTO);
+            return await _service.UpdateUserForAdmin(id, userDTO);
         }
 
         [HttpDelete("users/{id}")]

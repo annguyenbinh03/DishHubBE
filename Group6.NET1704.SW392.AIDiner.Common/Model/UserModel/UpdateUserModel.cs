@@ -10,7 +10,7 @@ namespace Group6.NET1704.SW392.AIDiner.Common.UserModel
 {
     public class UpdateUserModel
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         public string? Username { get; set; }
        
