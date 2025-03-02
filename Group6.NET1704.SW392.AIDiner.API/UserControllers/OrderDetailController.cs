@@ -17,8 +17,8 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
             _orderDetailService = orderDetailService;
         }
 
-        [HttpGet("details")]
-        public async Task<IActionResult> GetOrderDetailByOrderID([FromQuery] int orderId)
+        [HttpGet("orders/{orderId}/details")]
+        public async Task<IActionResult> GetOrderDetailByOrderID([FromRoute] int orderId)
         {
             var response = await _orderDetailService.GetOrderDetailByOrderID(orderId);
             return Ok(response);
