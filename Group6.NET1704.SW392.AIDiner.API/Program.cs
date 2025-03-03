@@ -4,7 +4,6 @@ using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Data;
 using Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 using Group6.NET1704.SW392.AIDiner.DAL.Data;
-using Group6.NET1704.SW392.AIDiner.DAL.Services;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Group6.NET1704.SW392.AIDiner.Services.Implementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Group6.NET1704.SW392.AIDiner.DAL.Repositories.Interfaces;
 using Group6.NET1704.SW392.AIDiner.DAL.Repositories;
+using Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,7 +28,7 @@ builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRequestService, RequestService>();
-builder.Services.AddScoped<IRequestTypeService, RequestTypeService>();
+builder.Services.AddScoped<IVnpayService, VnpayService>();
 
 builder.Services.AddScoped<GeminiService>(provider =>
 {

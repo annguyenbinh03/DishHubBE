@@ -12,12 +12,11 @@ using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
-using Group6.NET1704.SW392.AIDiner.Services.Implementation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Group6.NET1704.SW392.AIDiner.DAL.Services
+namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 {
     public class AuthenService : IAuthenService
     {
@@ -178,7 +177,7 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Services
                 string token = GenerateJwtToken(user);
 
                 response.Data = new { token };
-              
+
             }
             catch (Exception ex)
             {
