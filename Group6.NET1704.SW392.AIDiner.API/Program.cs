@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+    using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Data;
@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using Group6.NET1704.SW392.AIDiner.DAL.Repositories.Interfaces;
 using Group6.NET1704.SW392.AIDiner.DAL.Repositories;
 using Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay;
+using Group6.NET1704.SW392.AIDiner.Services.BusinessObjects;
+using Microsoft.Extensions.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,10 +37,14 @@ builder.Services.AddScoped<GeminiService>(provider =>
     string apiKey = builder.Configuration["Gemini:Key"];
     return new GeminiService(apiKey);
 });
-
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddScoped<IAuthenService, AuthenService>();
+
+var configuration = builder.Configuration;
+
+builder.Services.Configure<VNPaySettings>(configuration.GetSection("VNPaySettings"));
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -1,7 +1,10 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay;
+using Group6.NET1704.SW392.AIDiner.Services.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Web;
 
 namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
 {
@@ -19,24 +22,21 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
         public async Task<ResponseDTO> ProcessPayment(int orderId)
         {
             int methodId = 1;
-
             return await _vpnpayService.Charge(orderId, methodId);
         }
         [HttpGet("vnpay/confirm")]
         public async Task<IActionResult> ConfirmPayment()
         {
-            Dictionary<string, string> queryParams = HttpContext.Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString());
-            ResponseDTO response = await _vpnpayService.ConfirmPayment(queryParams);
-
+            ResponseDTO response = await _vpnpayService.ConfirmPayment(Request);
             if (response.IsSucess)
             {
-                // Lấy URL Redirect từ Response
-                string redirectUrl = response.Data.GetType().GetProperty("RedirectUrl")?.GetValue(response.Data, null)?.ToString();
+                string redirectUrl = response.Data?.GetType().GetProperty("redirectURL")?.GetValue(response.Data, null)?.ToString() ?? "/default-url";
                 return Redirect(redirectUrl);
             }
-
-            return BadRequest(response);
+            else
+            {
+                return Ok(response);
+            }
         }
-
     }
 }

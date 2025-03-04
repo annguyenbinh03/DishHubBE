@@ -2,25 +2,24 @@
 using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Group6.NET1704.SW392.AIDiner.Services.BusinessObjects;
+using Group6.NET1704.SW392.AIDiner.Services.Util;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using System.Web;
 
 namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
 {
     public class VnpayService : IVnpayService
     {
-        private IConfiguration _configuration;
+        private readonly VNPaySettings _vNPaySettings;
         private readonly IGenericRepository<Order> _orderRepository;
         private readonly IGenericRepository<Payment> _paymentRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public VnpayService(IConfiguration configuration, IGenericRepository<Order> orderRepository, IGenericRepository<Payment> paymentRepository, IUnitOfWork unitOfWork)
+        public VnpayService(IOptions<VNPaySettings> vnPaySettings, IGenericRepository<Order> orderRepository, IGenericRepository<Payment> paymentRepository, IUnitOfWork unitOfWork)
         {
-            _configuration = configuration;
+            _vNPaySettings = vnPaySettings.Value;
             _orderRepository = orderRepository;
             _paymentRepository = paymentRepository;
             _unitOfWork = unitOfWork;
@@ -39,6 +38,13 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
                     response.Data = "Order not found";
                     return response;
                 }
+                if (order.Status.Equals("completed") || order.Status.Equals("cancelled"))
+                {
+                    response.IsSucess = false;
+                    response.BusinessCode = BusinessCode.NOT_FOUND;
+                    response.Data = "Đơn hàng đã hoàn tất hoặc bị hủy!";
+                    return response;
+                }
                 decimal totalAmount = order.TotalAmount;
                 if (totalAmount <= 0)
                 {
@@ -47,23 +53,11 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
                     response.Data = "Total amount must be greater than 0";
                     return response;
                 }
-                string transactionCode = Guid.NewGuid().ToString();
-                var newPayment = new Payment
-                {
-                    OrderId = orderId,
-                    MethodId = methodId,
-                    TransactionCode = transactionCode,
-                    CreatedAt = DateTime.UtcNow,
-                    Amount = totalAmount,
-                    Status = false
-                };
-                await _paymentRepository.Insert(newPayment);
-                await _unitOfWork.SaveChangeAsync();
                 string paymentUrl = CreatePaymentUrl(totalAmount, orderId);
 
                 response.IsSucess = true;
                 response.BusinessCode = BusinessCode.CREATE_SUCCESS;
-                response.Data = new { PaymentUrl = paymentUrl, TransactionCode = transactionCode };
+                response.Data = new { url = paymentUrl };
 
             }
             catch (Exception ex)
@@ -75,100 +69,124 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
             return response;
         }
 
+
         public string CreatePaymentUrl(decimal amount, int orderId)
         {
-            string tmnCode = _configuration["Vnpay:TmnCode"];
-            string hashSecret = _configuration["Vnpay:HashSecret"];
-            string returnUrl = _configuration["Vnpay:ReturnUrl"];
-            string vnpayUrl = _configuration["Vnpay:VnpayUrl"];
+            string hostName = System.Net.Dns.GetHostName();
+            string clientIPAddress = System.Net.Dns.GetHostAddresses(hostName).GetValue(0).ToString();
+            string infor = "Thanh toan cho orderId: " + orderId.ToString();
+            string tnxRef = DateTime.Now.ToString("ddHHmmssyyyy");
+            tnxRef = tnxRef + orderId.ToString();
 
-            VnPayLibrary vnpay = new VnPayLibrary();
+            string vnp_Amount = ((int)amount).ToString() + "00";
 
-            vnpay.AddRequestData("vnp_Version", "2.1.0");
-            vnpay.AddRequestData("vnp_Command", "pay");
-            vnpay.AddRequestData("vnp_TmnCode", tmnCode);
-            vnpay.AddRequestData("vnp_Amount", ((int)(amount * 100)).ToString());
-            vnpay.AddRequestData("vnp_CreateDate", DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
-            vnpay.AddRequestData("vnp_CurrCode", "VND");
-            vnpay.AddRequestData("vnp_IpAddr", "127.0.0.1");
-            vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_OrderInfo", $"Thanh toán đơn hàng: {orderId}");
-            vnpay.AddRequestData("vnp_OrderType", "billpayment");
-            vnpay.AddRequestData("vnp_ReturnUrl", returnUrl);
-            vnpay.AddRequestData("vnp_TxnRef", orderId.ToString());
+            VNPayHelper pay = new VNPayHelper();
+            pay.AddRequestData("vnp_Version", "2.1.0");
+            pay.AddRequestData("vnp_Command", "pay");
+            pay.AddRequestData("vnp_TmnCode",_vNPaySettings.TmnCode);
+            pay.AddRequestData("vnp_Amount", vnp_Amount);
+            pay.AddRequestData("vnp_BankCode", "");
+            pay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            pay.AddRequestData("vnp_CurrCode", "VND");
+            pay.AddRequestData("vnp_IpAddr", clientIPAddress);
+            pay.AddRequestData("vnp_Locale", "vn");
+            pay.AddRequestData("vnp_OrderInfo", orderId.ToString());
+            pay.AddRequestData("vnp_OrderType", "other");
+            pay.AddRequestData("vnp_ReturnUrl", _vNPaySettings.ReturnUrl);
+            pay.AddRequestData("vnp_TxnRef", tnxRef);
 
-            return vnpay.CreateRequestUrl(vnpayUrl, hashSecret);
+            return pay.CreateRequestUrl(_vNPaySettings.VnpayUrl, _vNPaySettings.HashSecret);
         }
 
-        public async Task<ResponseDTO> ConfirmPayment(Dictionary<string, string> queryParams)
+        public async Task<ResponseDTO> ConfirmPayment(HttpRequest request)
         {
             ResponseDTO response = new ResponseDTO();
             try
             {
-                // 1. Kiểm tra các tham số quan trọng từ VNPAY
-                if (!queryParams.TryGetValue("vnp_ResponseCode", out string vnp_ResponseCode) ||
-                    !queryParams.TryGetValue("vnp_TxnRef", out string vnp_TxnRef) ||
-                    !queryParams.TryGetValue("vnp_TransactionNo", out string vnp_TransactionNo))
+                if (!request.QueryString.HasValue)
                 {
                     response.IsSucess = false;
-                    response.BusinessCode = BusinessCode.INVALID_INPUT;
-                    response.Data = "Thiếu thông tin từ VNPAY";
+                    response.BusinessCode = BusinessCode.EXCEPTION;
+                    response.message = "VNPAY Querry string not found";
                     return response;
                 }
 
-                // 2. Parse orderId từ vnp_TxnRef
-                if (!int.TryParse(vnp_TxnRef, out int orderId))
+                var queryString = request.QueryString.Value;
+                var json = HttpUtility.ParseQueryString(queryString);
+
+                string txnRef = json["vnp_TxnRef"].ToString();
+                int orderId = Convert.ToInt32(json["vnp_OrderInfo"]);
+                long vnpayTranId = Convert.ToInt64(json["vnp_TransactionNo"]);
+                string vnp_ResponseCode = json["vnp_ResponseCode"].ToString();
+                string vnp_SecureHash = json["vnp_SecureHash"].ToString();
+                string stringAmount = json["vnp_Amount"].ToString();
+                int pos = queryString.IndexOf("&vnp_SecureHash");
+
+                bool checkSignature = ValidateSignature(queryString.Substring(1, pos - 1), vnp_SecureHash, _vNPaySettings.HashSecret);
+                if (!checkSignature || _vNPaySettings.TmnCode != json["vnp_TmnCode"].ToString())
                 {
                     response.IsSucess = false;
-                    response.BusinessCode = BusinessCode.INVALID_INPUT;
-                    response.Data = "Không lấy được orderId từ vnp_TxnRef";
+                    response.BusinessCode = BusinessCode.EXCEPTION;
+                    response.message = "Invalid signature or incorrect merchant code.";
                     return response;
                 }
 
-                var order = await _orderRepository.GetById(orderId);
-                if (order == null)
+                decimal amount;
+                bool isParseSucess = Decimal.TryParse(stringAmount, out amount);
+
+                if (!isParseSucess)
                 {
                     response.IsSucess = false;
-                    response.BusinessCode = BusinessCode.NOT_FOUND;
-                    response.Data = "Không tìm thấy đơn hàng";
+                    response.BusinessCode = BusinessCode.PAYMENT_FAILED;
+                    response.Data = "Parse giá trị đơn hàng thất bại";
                     return response;
                 }
 
-                // 3. Kiểm tra chữ ký VNPAY (nếu có)
-                if (!queryParams.TryGetValue("vnp_SecureHash", out string vnp_SecureHash) ||
-                    !ValidateSignature(queryParams, vnp_SecureHash))
-                {
-                    response.IsSucess = false;
-                    response.Data = "Chữ ký VNPAY không hợp lệ";
-                    return response;
-                }
+                amount /= 100;
 
-                // 4. Xử lý thanh toán nếu thành công (vnp_ResponseCode == "00")
                 if (vnp_ResponseCode == "00")
                 {
                     var payment = new Payment
                     {
                         OrderId = orderId,
-                        MethodId = 1, // VNPAY
-                        TransactionCode = vnp_TransactionNo,
+                        MethodId = 1,
+                        TransactionCode = vnpayTranId.ToString(),
                         CreatedAt = DateTime.UtcNow,
-                        Amount = order.TotalAmount,
+                        Amount = amount,
                         Description = $"Thanh toán thành công cho orderId {orderId}",
                         Status = true,
                     };
 
+                    var order = await _orderRepository.GetById(orderId);
+
                     await _paymentRepository.Insert(payment);
                     order.Status = "completed";
+                    order.PaymentStatus = true;
                     await _orderRepository.Update(order);
                     await _unitOfWork.SaveChangeAsync();
 
+                    string redirectURL = _vNPaySettings.RedirectUrl + $"/{payment.Id}";
+
                     response.IsSucess = true;
                     response.BusinessCode = BusinessCode.CREATE_SUCCESS;
-                    response.Data = new { PaymentId = payment.Id, RedirectUrl = $"https://dishhub-dxfrckc2c3fjgch4.southeastasia-01.azurewebsites.net/{payment.Id}" };
+                    response.Data = new { redirectURL };
                     return response;
                 }
                 else
                 {
+                    var payment = new Payment
+                    {
+                        OrderId = orderId,
+                        MethodId = 1,
+                        TransactionCode = vnpayTranId.ToString(),
+                        CreatedAt = DateTime.UtcNow,
+                        Amount = amount,
+                        Description = $"Thanh toán thất bại cho orderId {orderId}",
+                        Status = false,
+                    };
+                    await _paymentRepository.Insert(payment);
+                    await _unitOfWork.SaveChangeAsync();
+
                     response.IsSucess = false;
                     response.BusinessCode = BusinessCode.PAYMENT_FAILED;
                     response.Data = "Thanh toán thất bại";
@@ -183,25 +201,11 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
                 return response;
             }
         }
-        private bool ValidateSignature(Dictionary<string, string> queryParams, string inputHash)
+        private bool ValidateSignature(string rspraw, string inputHash, string secretKey)
         {
-            if (!queryParams.ContainsKey("vnp_SecureHash"))
-                return false;
-
-            string secretKey = _configuration["Vnpay:HashSecret"];
-            Dictionary<string, string> sortedParams = queryParams
-        .Where(x => x.Key != "vnp_SecureHash" && x.Key != "vnp_SecureHashType")
-        .OrderBy(x => x.Key)
-        .ToDictionary(x => x.Key, x => x.Value);
-
-
-            string rawData = string.Join("&", sortedParams.Select(x => $"{x.Key}={x.Value}"));
-            string myChecksum = Utils.HmacSHA512(secretKey, rawData);
-
+            string myChecksum = VNPayHelper.HmacSHA512(secretKey, rspraw);
             return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
         }
-
-
     }
-    }
+}
 

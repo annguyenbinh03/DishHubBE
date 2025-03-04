@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
     {
         Task<ResponseDTO> Charge(int orderId, int methodId);
         string CreatePaymentUrl(decimal amount, int orderId);
-        Task<ResponseDTO> ConfirmPayment(Dictionary<string, string> queryParams);
+        Task<ResponseDTO> ConfirmPayment(HttpRequest request);
     }
 }
