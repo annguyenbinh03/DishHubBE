@@ -29,26 +29,52 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             _requestTypeRepository = requestTypeRepository;
         }
 
-        public async Task<ResponseDTO> GetAllRequest()
+        public async Task<ResponseDTO> GetAllRequest(int restaurantId)
         {
-           ResponseDTO response = new ResponseDTO();
+            ResponseDTO response = new ResponseDTO();
             try
             {
-                var requests = await _requestRepository.GetQueryable().Include(r => r.Type)
-                    .Select(r => new
-                    {
-                        r.Id,
-                        r.OrderId,
-                        r.TypeId,
-                        TypeName = r.Type.Name,
-                        r.Note,
-                        CreatedAt = r.CreatedAt.HasValue ? r.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
-                        ProcessedAt = r.ProcessedAt.HasValue ? r.ProcessedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
-                        r.Status,
-                    }).ToListAsync();
+                if (restaurantId > 0)
+                {
+                        var requests = await _requestRepository.GetQueryable().Include(r => r.Type)
+                       .Include(r => r.Order)
+                       .ThenInclude(o => o.Table)
+                       .ThenInclude(t => t.Restaurant)
+                       .Where(r => r.Order.Table.Restaurant.Id == restaurantId)
+                       .Select(r => new
+                       {
+                           r.Id,
+                           r.OrderId,
+                           r.TypeId,
+                           TypeName = r.Type.Name,
+                           r.Note,
+                           CreatedAt = r.CreatedAt.HasValue ? r.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
+                           ProcessedAt = r.ProcessedAt.HasValue ? r.ProcessedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
+                           r.Status,
+                           tableName = r.Order.Table.Name
+                       }).ToListAsync();
+                    response.Data = requests;
+                }
+                else
+                {
+                      var requests = await _requestRepository.GetQueryable().Include(r => r.Type)
+                     .Select(r => new
+                     {
+                         r.Id,
+                         r.OrderId,
+                         r.TypeId,
+                         TypeName = r.Type.Name,
+                         r.Note,    
+                         CreatedAt = r.CreatedAt.HasValue ? r.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
+                         ProcessedAt = r.ProcessedAt.HasValue ? r.ProcessedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
+                         r.Status,
+                         table = r.Order.Table.Name
+                     }).ToListAsync();
+                    response.Data = requests;
+                }
                 response.IsSucess = true;
                 response.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
-                response.Data = requests;
+
             }
             catch (Exception ex)
             {
@@ -73,7 +99,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     return response;
                 }
                 var allowedStatuses = new[] { "pending", "inProgress", "completed", "cancelled" };
-                if(!Array.Exists(allowedStatuses, s => s.Equals(status, StringComparison.OrdinalIgnoreCase)))
+                if (!Array.Exists(allowedStatuses, s => s.Equals(status, StringComparison.OrdinalIgnoreCase)))
                 {
                     response.IsSucess = false;
                     response.BusinessCode = BusinessCode.INVALID_INPUT;
@@ -82,10 +108,10 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 }
                 request.Status = status;
                 request.ProcessedAt = DateTime.UtcNow;
-                
+
                 await _requestRepository.Update(request);
                 await _unitOfWork.SaveChangeAsync();
-                
+
                 response.IsSucess = true;
                 response.BusinessCode = BusinessCode.UPDATE_SUCESSFULLY;
                 response.Data = new
@@ -107,7 +133,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             }
             return response;
         }
-       
+
 
         public async Task<ResponseDTO> GetRequestByOrderID(int orderID)
         {

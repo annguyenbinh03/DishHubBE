@@ -24,9 +24,9 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
         }
         // [Authorize(Roles = "Manager")]
         [HttpGet]
-        public async Task<ResponseDTO> GetAllRequest()
+        public async Task<ResponseDTO> GetAllRequest([FromQuery] int restaurantId = 0)
         {
-            return await _requestService.GetAllRequest();
+            return await _requestService.GetAllRequest(restaurantId);
         }
         [HttpPost]
         public async Task<ResponseDTO> CreateRequest(CreateRequestDTO requestDto)
