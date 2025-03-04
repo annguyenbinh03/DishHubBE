@@ -9,5 +9,6 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO.AdminDTO
     public class CreateDishCategoryForAdminDTO
     {
         public string? Name { get; set; }
+        public string? Image { get; set; }
     }
 }

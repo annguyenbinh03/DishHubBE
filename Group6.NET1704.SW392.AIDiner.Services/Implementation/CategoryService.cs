@@ -120,7 +120,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 var newCategory = new Category
                 {
                     Name = createDishCategoryForAdminDTO.Name,
-
+                    Image = createDishCategoryForAdminDTO.Image
                 };
 
                 await _categoryRepositoy.Insert(newCategory);
