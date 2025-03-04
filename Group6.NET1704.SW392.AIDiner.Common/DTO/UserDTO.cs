@@ -16,6 +16,7 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO
         public DateTime? Dob { get; set; }
         public string PhoneNumber { get; set; }
         public int? RoleId { get; set; }
+        public string? RoleName { get; set; }
         public DateTime? CreateAt { get; set; }
         public string Address { get; set; }
         public string Avatar { get; set; }

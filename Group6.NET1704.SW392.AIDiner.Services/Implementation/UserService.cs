@@ -64,6 +64,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         Dob = u.Dob,
                         PhoneNumber = u.PhoneNumber,
                         RoleId = u.RoleId,
+                        RoleName = u.Role.Name,
                         CreateAt = u.CreateAt,
                         Address = u.Address,
                         Status = !u.IsDeleted,
