@@ -37,8 +37,8 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 dto.Data = category.Items.Select(c => new CategoryDTO
                 {
                     Id = c.Id,
-                    Name = c.Name,                   
-                    //Status = c.Status,
+                    Name = c.Name,
+                    IsDeleted = c.IsDeleted,
                     Image = c.Image,
                 }).ToList();
                 dto.IsSucess = true;
