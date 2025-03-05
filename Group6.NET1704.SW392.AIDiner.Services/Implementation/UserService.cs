@@ -33,6 +33,8 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             {
                 var query = _userRepository.GetQueryable().AsQueryable();
 
+                query = query.Include(u => u.Role);
+
                 if (!string.IsNullOrEmpty(search))
                 {
                     query = query.Where(u => u.Username.Contains(search) || u.Email.Contains(search));
@@ -67,7 +69,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         RoleName = u.Role.Name,
                         CreateAt = u.CreateAt,
                         Address = u.Address,
-                        Status = !u.IsDeleted,
+                        IsDeleted = u.IsDeleted,
                         Avatar = u.Avatar
                     }).ToList()
                 };
@@ -109,7 +111,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     RoleId = user.RoleId,
                     CreateAt = user.CreateAt,
                     Address = user.Address,
-                    //Status = user.Status,
+                    IsDeleted = user.IsDeleted,
                     Avatar = user.Avatar
                 };
 
@@ -146,7 +148,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 if (userDTO.Dob.HasValue) existingUser.Dob = userDTO.Dob.Value;
                 if (userDTO.PhoneNumber != null) existingUser.PhoneNumber = userDTO.PhoneNumber;
                 if (userDTO.Address != null) existingUser.Address = userDTO.Address;
-                //if (userDTO.Status.HasValue) existingUser.Status = userDTO.Status.Value;
+                if (userDTO.IsDeleted.HasValue) existingUser.IsDeleted = userDTO.IsDeleted.Value;
                 if (userDTO.Avatar != null) existingUser.Avatar = userDTO.Avatar;
 
                 if (await _userRepository.ExistsAsync(u => u.Username == existingUser.Username && u.Id != existingUser.Id))
@@ -175,7 +177,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         Dob = existingUser.Dob,
                         PhoneNumber = existingUser.PhoneNumber,
                         Address = existingUser.Address,
-                        //Status = existingUser.Status,
+                        IsDeleted = existingUser.IsDeleted,
                         Avatar = existingUser.Avatar,
 
                     }

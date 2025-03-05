@@ -21,7 +21,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
         }
 
         [HttpGet("users")]
-        public async Task<ResponseDTO> GetAllUser(int page, int size, string? search, string? sort_by, string? sort_order)
+        public async Task<ResponseDTO> GetAllUser(int page = 1, int size = 10, string? search = null, string? sort_by = null, string? sort_order = null)
         {
             return await _service.GetAllUser(page, size, search, sort_by, sort_order);
         }
