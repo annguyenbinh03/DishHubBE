@@ -126,6 +126,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Price = d.Price,
                     Image = d.Image,
                     RestaurantId = d.RestaurantId,
+                    SoldCount = d.SoldCount,
                 }).ToList();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
