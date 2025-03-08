@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.AdminDTO;
 using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
 using Group6.NET1704.SW392.AIDiner.Common.UserModel;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
@@ -44,6 +45,11 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
         {
             return await _service.DeleteUserForAdmin(id);
 
+        }
+        [HttpPost("users")]
+        public async Task<ResponseDTO> CreateUser([FromBody] AdminCreateAccountDTO model)
+        {
+            return await _service.CreateUserAsync(model);
         }
     }
 }
