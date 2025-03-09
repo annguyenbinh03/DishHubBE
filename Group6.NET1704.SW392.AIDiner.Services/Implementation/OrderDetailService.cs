@@ -1,5 +1,6 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
+using Group6.NET1704.SW392.AIDiner.Common.Response;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
@@ -63,6 +64,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 {
                     dto.IsSucess = false;
                     dto.BusinessCode = BusinessCode.NOT_FOUND;
+                    dto.message = "No Orderdetail inside this Order";
                     return dto;
                 }
 
@@ -195,25 +197,21 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         orderDetail.Status = status;
                     else
                         throw new Exception("Status only can change from pending to confirmed or rejected");
-                }
-
-                if (orderDetail.Status == "confirmed")
+                } else  if (orderDetail.Status == "confirmed")
                 {
                     if (status == "preparing" || status == "rejected")
                         orderDetail.Status = status;
                     else
                         throw new Exception("Status only can change from confirmed to preparing or rejected");
-                }
-
-
-                if (orderDetail.Status == "preparing")
+                } else if (orderDetail.Status == "preparing")
                 {
                     if (status == "delivered" || status == "rejected")
                         orderDetail.Status = status;
                     else
                         throw new Exception("Status only can change from preparing to delivered or rejected");
                 }
-
+                await _orderDetailRepositoy.Update(orderDetail);
+                await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
             }
             catch (Exception e)
@@ -224,6 +222,36 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             }
 
             return dto;
+        }
+
+
+
+        public async Task<List<OrderDetailHubResponse>> getRestaurantCurrentOrderDetail(int restaurantId)
+        {
+            var today = DateTime.Today;
+            var querryData = await _orderDetailRepositoy.GetAllDataByExpression(od =>
+                od.Order.Table.Restaurant.Id == restaurantId /*&& od.Order.CreatedAt == today*/ , null, null, includes: new Expression<Func<OrderDetail, object>>[]
+    {
+        od => od.Dish,
+        od => od.Order,
+        od => od.Order.Table
+    });
+
+            var orderDetails = querryData.Items
+                .Select(item => new OrderDetailHubResponse
+                {
+                    Id = item.Id,
+                    OrderId = item.OrderId,
+                    DishId = item.DishId,
+                    DishName = item.Dish.Name,
+                    DishImage = item.Dish.Image,
+                    TableName = item.Order.Table.Name,
+                    Quantity = item.Quantity,
+                    Price = item.Price,
+                    Status = item.Status,
+
+                }).ToList();
+            return orderDetails;
         }
     }
 }
