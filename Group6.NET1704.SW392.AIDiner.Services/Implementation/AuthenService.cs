@@ -169,8 +169,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 var user = await _unitOfWork.Users.FindUserByEmailAsync(payload.Email);
                 if (user == null)
                 {
-                    // Nếu chưa có, có thể tạo tài khoản mới hoặc từ chối
-                    user = await _unitOfWork.Users.CreateUserAsync(payload.Email, payload.Name);
+                    throw new Exception("User not found");
                 }
 
                 // Tạo JWT token của hệ thống cho user
@@ -183,6 +182,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             {
                 response.IsSucess = false;
                 response.BusinessCode = BusinessCode.EXCEPTION;
+                response.message = ex.Message;
             }
             return response;
         }

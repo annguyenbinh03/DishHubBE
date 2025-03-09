@@ -286,6 +286,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 dish.Price = updateDishDTO.Price ?? dish.Price;
                 dish.Image = updateDishDTO.Image ?? dish.Image;
                 dish.Status = updateDishDTO.Status ?? dish.Status;
+                dish.RestaurantId = updateDishDTO.RestaurantId ?? dish.RestaurantId;
                 var existingIngredients = await _unitOfWork.DishIngredientRepository
                     .GetQueryable()
                     .Where(di => di.DishId == dishId)

@@ -131,8 +131,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     rt.Name
                 }).ToList();
 
-                await _unitOfWork.SaveChangeAsync(); 
-
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
             }

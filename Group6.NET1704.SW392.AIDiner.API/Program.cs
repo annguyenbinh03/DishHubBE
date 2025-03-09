@@ -14,6 +14,7 @@ using Group6.NET1704.SW392.AIDiner.DAL.Repositories;
 using Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay;
 using Group6.NET1704.SW392.AIDiner.Services.BusinessObjects;
 using Microsoft.Extensions.Configuration;
+using Group6.NET1704.SW392.AIDiner.Services.Hubs;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,17 +22,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Đăng ký các dịch vụ vào container
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDishService, DishService>();
 builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
-builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IRestaurantRepository, RestaurantRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IRequestService, RequestService>();
 builder.Services.AddScoped<IVnpayService, VnpayService>();
-
 builder.Services.AddScoped<GeminiService>(provider =>
 {
     string apiKey = builder.Configuration["Gemini:Key"];
@@ -40,6 +37,11 @@ builder.Services.AddScoped<GeminiService>(provider =>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddScoped<IAuthenService, AuthenService>();
+builder.Services.AddScoped<IRequestService, RequestService>();
+builder.Services.AddScoped<IRequestTypeService, RequestTypeService>();
+builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 
 var configuration = builder.Configuration;
 
@@ -163,17 +165,33 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // Chỉ cho phép React truy cập
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // Bắt buộc có nếu gửi credentials (cookie/token)
+    });
+});
+
+builder.Services.AddSignalR();
+
 // Chỉ gọi Build() MỘT LẦN
 var app = builder.Build();
+app.UseCors("AllowAll");
+
+app.MapHub<OrderDetailHub>("/hub/order-details").RequireCors("AllowSpecificOrigins");
 
 // Cấu hình pipeline của ứng dụng
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
+app.UseSwagger();
     app.UseSwaggerUI();
 //}
 // Áp dụng CORS
-app.UseCors("AllowAll");
+
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

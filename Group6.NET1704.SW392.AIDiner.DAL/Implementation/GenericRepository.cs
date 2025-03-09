@@ -16,7 +16,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         _dbSet = context.Set<T>();  
     }  
     public async Task<PagedResult<T>> GetAllDataByExpression(Expression<Func<T, bool>>? filter,  
-       int pageNumber, int pageSize,  
+       int? pageNumber, int? pageSize,  
        Expression<Func<T, object>>? orderBy = null,  
        bool isAscending = true,  
        params Expression<Func<T, object>>[]? includes)  
@@ -36,9 +36,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         {            Items = null,  
             TotalPages = 0  
         };  
-        if (pageNumber > 0 && pageSize > 0)  
+        if ( (pageSize != null && pageNumber != null ) && (   pageNumber > 0 && pageSize > 0))  
         {            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);  
-            query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);  
+            query = query.Skip(((pageNumber ?? 1 ) - 1) * (pageSize ?? int.MaxValue)).Take(pageSize ?? int.MaxValue);  
             result.Items = await query.AsNoTracking().ToListAsync();  
             result.TotalPages = totalPages;  
             return result;  
