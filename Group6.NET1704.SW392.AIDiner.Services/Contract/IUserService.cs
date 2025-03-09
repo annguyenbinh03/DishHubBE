@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.AdminDTO;
 using Group6.NET1704.SW392.AIDiner.Common.Model.UserModel;
 using Group6.NET1704.SW392.AIDiner.Common.UserModel;
 using System;
@@ -16,5 +17,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
         public Task<ResponseDTO> UpdateUserForAdmin(int id, UpdateUserModel userDTO);
         public Task<ResponseDTO> UpdateProfileUser(int id, UpdateProfileUserModel userDTO);
         public Task<ResponseIsSucessDTO> DeleteUserForAdmin(int id);
+        public Task<ResponseDTO> CreateUserAsync(AdminCreateAccountDTO model);
     }
 }
