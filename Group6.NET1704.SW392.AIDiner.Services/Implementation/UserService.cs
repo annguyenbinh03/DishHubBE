@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.AdminDTO;
 using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
 using Group6.NET1704.SW392.AIDiner.Common.Model.UserModel;
 using Group6.NET1704.SW392.AIDiner.Common.UserModel;
@@ -280,6 +281,64 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
 
             return dto;
+        }
+
+        public async Task<ResponseDTO> CreateUserAsync(AdminCreateAccountDTO model)
+        {
+            ResponseDTO response = new ResponseDTO();
+            try
+            {
+                if (model == null || string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
+                {
+                    response.IsSucess = false;
+                    response.BusinessCode = BusinessCode.INVALID_INPUT;
+                    response.message = "Invalid input data";
+                }
+                if (await _userRepository.ExistsAsync(u => u.Username == model.Username))
+                {
+                    response.IsSucess = false;
+                    response.BusinessCode = BusinessCode.USERNAME_ALREADY_EXISTS;
+                    response.message = "Username already exists";
+                    return response;
+                }
+
+                if (await _userRepository.ExistsAsync(u => u.Email == model.Email))
+                {
+                    response.IsSucess = false;
+                    response.BusinessCode = BusinessCode.EMAIL_ALREADY_EXISTS;
+                    response.message = "Email already exists";
+                    return response;
+                }
+
+                User newUser = new User
+                {
+                    Username = model.Username,
+                    FullName = model.FullName,
+                    Email = model.Email,
+                    Password = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                    Dob = model.Dob,
+                    PhoneNumber = model.PhoneNumber,
+                    Address = model.Address,
+                    Avatar = model.Avatar,
+                    IsDeleted = false,
+                    CreateAt = DateTime.UtcNow
+                };
+
+                await _userRepository.Insert(newUser);
+                await _unitOfWork.SaveChangeAsync();
+
+                response.IsSucess = true;
+                response.BusinessCode = BusinessCode.CREATE_SUCCESS;
+                response.message = "User created successfully";
+                response.Data = newUser;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.BusinessCode = BusinessCode.EXCEPTION;
+                response.message = "Error: " + ex.Message;
+            }
+            return response;
         }
     }
 }
