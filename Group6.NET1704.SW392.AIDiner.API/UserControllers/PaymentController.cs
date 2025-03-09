@@ -1,5 +1,6 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
+using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay;
 using Group6.NET1704.SW392.AIDiner.Services.Util;
 using Microsoft.AspNetCore.Http;
@@ -13,11 +14,14 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
     public class PaymentController : ControllerBase
     {
         private IVnpayService _vpnpayService;
+        private IPaymentService _paymentService;
 
-        public PaymentController(IVnpayService vpnpayService)
+        public PaymentController(IVnpayService vpnpayService, IPaymentService paymentService)
         {
             _vpnpayService = vpnpayService;
+            _paymentService = paymentService;
         }
+
         [HttpPost("{orderId}/pay")]
         public async Task<ResponseDTO> ProcessPayment(int orderId)
         {
@@ -38,5 +42,13 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
                 return Ok(response);
             }
         }
+
+        [HttpGet("by-restaurant")]
+        public async Task<IActionResult> GetPaymentByRestaurantId([FromQuery] int? restaurantId)
+        {
+            var resultList = await _paymentService.GetPaymentByRestaurantId(restaurantId);
+            return Ok(resultList);
+        }
+
     }
 }
