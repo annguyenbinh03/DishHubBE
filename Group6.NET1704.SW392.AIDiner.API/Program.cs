@@ -43,6 +43,7 @@ builder.Services.AddScoped<IRequestService, RequestService>();
 builder.Services.AddScoped<IRequestTypeService, RequestTypeService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 
 var configuration = builder.Configuration;
@@ -185,6 +186,7 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 
 app.MapHub<OrderDetailHub>("/hub/order-details").RequireCors("AllowSpecificOrigins");
+app.MapHub<RequestHub>("/hub/requests").RequireCors("AllowSpecificOrigins");
 
 // Cấu hình pipeline của ứng dụng
 //if (app.Environment.IsDevelopment())
