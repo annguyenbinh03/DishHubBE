@@ -11,5 +11,6 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO
         public int Id { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

@@ -89,7 +89,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Id = a.Id,
                     Name = a.Name,
                     Image = a.Image,
-
+                    IsDeleted = a.IsDeleted,
                 }).ToList();
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
