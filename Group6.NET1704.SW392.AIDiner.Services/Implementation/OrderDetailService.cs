@@ -4,6 +4,10 @@ using Group6.NET1704.SW392.AIDiner.Common.Response;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Group6.NET1704.SW392.AIDiner.Services.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,15 +22,17 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
         private readonly IGenericRepository<OrderDetail> _orderDetailRepositoy;
         private readonly IGenericRepository<Order> _orderRepository;
         private readonly IGenericRepository<Dish> _dishRepository;
+        private readonly IHubContext<OrderDetailHub> _orderHubContext;
 
         private readonly IUnitOfWork _unitOfWork;
 
-        public OrderDetailService(IGenericRepository<OrderDetail> orderDetailRepositoy, IGenericRepository<Order> orderRepository, IGenericRepository<Dish> dishRepository, IUnitOfWork unitOfWork)
+        public OrderDetailService(IGenericRepository<OrderDetail> orderDetailRepositoy, IGenericRepository<Order> orderRepository, IGenericRepository<Dish> dishRepository, IUnitOfWork unitOfWork, IHubContext<OrderDetailHub> orderHubContext)
         {
             _orderDetailRepositoy = orderDetailRepositoy;
             _orderRepository = orderRepository;
             _dishRepository = dishRepository;
             _unitOfWork = unitOfWork;
+            _orderHubContext = orderHubContext;
         }
 
         public async Task<ResponseDTO> GetOrderDetailByOrderID(int orderId)
@@ -102,7 +108,8 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                var order = await _orderRepository.GetByExpression(o => o.Id == orderId);
+                var order = await _orderRepository.GetByExpression(o => o.Id == orderId, includeProperties: o=> o.Table.Restaurant);
+
                 if (order == null)
                 {
                     return new ResponseDTO { IsSucess = false, BusinessCode = BusinessCode.NOT_FOUND };
@@ -124,30 +131,15 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         return new ResponseDTO { IsSucess = false, BusinessCode = BusinessCode.NOT_FOUND };
                     }
 
-                    var existingOrderDetails = await _orderDetailRepositoy.GetAllDataByExpression(
-                        od => od.OrderId == orderId && od.DishId == dish.DishId, 0, 0);
-
-                    var existingOrderDetail = existingOrderDetails?.Items?.FirstOrDefault();
-
-                    if (existingOrderDetail != null)
+                    var orderDetail = new OrderDetail
                     {
-                        existingOrderDetail.Quantity += dish.Quantity;
-                        existingOrderDetail.Price = existingOrderDetail.Quantity * menuDish.Price;
-                        totalAmount += dish.Quantity * menuDish.Price;
-                    }
-                    else
-                    {
-                        var orderDetail = new OrderDetail
-                        {
-                            OrderId = orderId,
-                            DishId = dish.DishId,
-                            Quantity = dish.Quantity,
-                            Price = menuDish.Price * dish.Quantity,
-                            Status = "pending"
-                        };
-                        orderDetails.Add(orderDetail);
-                        totalAmount += orderDetail.Price;
-                    }
+                        OrderId = orderId,
+                        DishId = dish.DishId,
+                        Quantity = dish.Quantity,
+                        Price = menuDish.Price * dish.Quantity,
+                        Status = "pending"
+                    };
+                    orderDetails.Add(orderDetail);
                 }
 
                 if (orderDetails.Count > 0)
@@ -158,19 +150,31 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 order.TotalAmount = totalAmount;
                 await _unitOfWork.SaveChangeAsync();
 
+                int restaurantId = order.Table.Restaurant.Id; //to push notify in signal hub
+                string tableName = order.Table.Name;
+
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.CREATE_ORDER_SUCCESSFULLY;
                 dto.Data = new
                 {
-                    OrderId = orderId,
                     OrderDetails = orderDetails.Select(od => new
                     {
+                        Id = od.Id,
+                        OrderId = orderId,
                         DishId = od.DishId,
+                        DishName = od.Dish.Name,
+                        DishImage = od.Dish.Image,
+                        TableName = tableName,
                         Quantity = od.Quantity,
                         Price = od.Price,
-                        Status = od.Status
+                        Status = od.Status,
                     }).ToList()
                 };
+
+                foreach(var od in orderDetails)
+                {
+                   await _orderHubContext.Clients.Group(restaurantId.ToString()).SendAsync("ReceiveNewOrder", od);
+                }           
             }
             catch (Exception)
             {
@@ -186,7 +190,8 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                OrderDetail? orderDetail = await _orderDetailRepositoy.GetById(orderDetailId);
+                OrderDetail? orderDetail = await _orderDetailRepositoy.GetByIdAsync(orderDetailId, includes: p => p.Order.Table.Restaurant);
+
                 if (orderDetail == null) {
                     throw new Exception("not found order detail with orderDetaiId: " + orderDetailId);
                 }
@@ -213,6 +218,16 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 await _orderDetailRepositoy.Update(orderDetail);
                 await _unitOfWork.SaveChangeAsync();
                 dto.IsSucess = true;
+
+                int restaurantId = orderDetail.Order.Table.Restaurant.Id;
+
+                var updateOrderDetailStatus = new
+                {
+                    orderDetailId = orderDetailId,
+                    status = orderDetail.Status,
+                };
+
+                await _orderHubContext.Clients.Group(restaurantId.ToString()).SendAsync("UpdateOrderDetailStatus", updateOrderDetailStatus);
             }
             catch (Exception e)
             {

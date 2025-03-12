@@ -3,6 +3,7 @@ using Group6.NET1704.SW392.AIDiner.Common.Request;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
 {
@@ -11,6 +12,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
     public class OrderDetailController : ControllerBase
     {
         public IOrderDetailService _orderDetailService;
+
 
         public OrderDetailController(IOrderDetailService orderDetailService)
         {
@@ -31,17 +33,17 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
             return Ok(response);
         }
 
-        [HttpPost("orders/{id}/details")]
-        public async Task<IActionResult> AddDishToOrder([FromRoute] int id, [FromBody] List<DishRequestDTO> dishes)
+        [HttpPost("orders/{orderId}/details")]
+        public async Task<IActionResult> AddDishToOrder([FromRoute] int orderId, [FromBody] List<DishRequestDTO> dishes)
         {
-            var response = await _orderDetailService.AddDishToOrder(id, dishes);
+            var response = await _orderDetailService.AddDishToOrder(orderId, dishes);
             return Ok(response);
         }
 
-        [HttpPatch("orders/details/{id}")]
-        public async Task<IActionResult> ChangeStatus([FromRoute] int id, [FromBody] ChangeOrderDetailStatusRequest request)
+        [HttpPatch("orders/details/{orderId}")]
+        public async Task<IActionResult> ChangeStatus([FromRoute] int orderId, [FromBody] ChangeOrderDetailStatusRequest request)
         {
-            var response = await _orderDetailService.ChangeStatus(id, request.status);
+            var response = await _orderDetailService.ChangeStatus(orderId, request.status);
             return Ok(response);
         }
     }

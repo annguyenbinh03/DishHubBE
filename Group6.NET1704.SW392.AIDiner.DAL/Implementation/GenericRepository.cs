@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Data;
@@ -50,7 +50,29 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     }  
     public async Task<T> GetById(object id)  
     {        return await _dbSet.FindAsync(id);  
-    }  
+    }
+
+    public async Task<T?> GetByIdAsync(object id, params Expression<Func<T, object>>[] includes)
+    {
+        IQueryable<T> query = _context.Set<T>();
+
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+        var keyName = _context.Model
+                              .FindEntityType(typeof(T))?
+                              .FindPrimaryKey()?
+                              .Properties
+                              .Select(x => x.Name)
+                              .FirstOrDefault();
+
+        if (keyName == null)
+            throw new InvalidOperationException($"Can not find primary key for {typeof(T).Name}");
+
+        return await query.FirstOrDefaultAsync(e => EF.Property<object>(e, keyName) == id);
+    }
+
     public async Task<T> Insert(T entity)  
     {        await _dbSet.AddAsync(entity);  
         return entity;  

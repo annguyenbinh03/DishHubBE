@@ -1,4 +1,4 @@
-﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+﻿    using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using System;
 using System.Collections.Generic;
@@ -18,6 +18,8 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Contract
             params Expression<Func<T, object>>[]? includes);
 
         Task<T> GetById(object id);
+
+        Task<T?> GetByIdAsync(object id, params Expression<Func<T, object>>[] includes);
 
         Task<T?> GetByExpression(Expression<Func<T?, bool>> filter,
             params Expression<Func<T, object>>[]? includeProperties);

@@ -3,7 +3,6 @@ using System.Text;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Data;
 using Group6.NET1704.SW392.AIDiner.DAL.Implementation;
-using Group6.NET1704.SW392.AIDiner.DAL.Data;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Group6.NET1704.SW392.AIDiner.Services.Implementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,7 +12,6 @@ using Group6.NET1704.SW392.AIDiner.DAL.Repositories.Interfaces;
 using Group6.NET1704.SW392.AIDiner.DAL.Repositories;
 using Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay;
 using Group6.NET1704.SW392.AIDiner.Services.BusinessObjects;
-using Microsoft.Extensions.Configuration;
 using Group6.NET1704.SW392.AIDiner.Services.Hubs;
 
 

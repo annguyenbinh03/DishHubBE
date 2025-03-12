@@ -41,13 +41,5 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Hubs
             }
             await base.OnConnectedAsync();
         }
-
-        //Khi khách hàng đặt món, đẩy lên danh sách và thông báo staff
-        public async Task NotifyStaffNewOrder(int restaurantId, OrderDetailHubResponse orderDetail)
-        {
-
-            await Clients.Group(restaurantId.ToString())
-               .SendAsync("ReceiveNewOrder", orderDetail);
-        }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.Common.Response;
-using Group6.NET1704.SW392.AIDiner.Services.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Group6.NET1704.SW392.AIDiner.Services.Hubs;
 
 namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
 {
