@@ -11,6 +11,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
 {
     [Route("api/admin")]
     [ApiController]
+    [Authorize(Roles = "Manager")]
     public class AdminForTableController : ControllerBase
     {
         private ITableService _service;

@@ -7,6 +7,7 @@ using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
 using Group6.NET1704.SW392.AIDiner.Common.Model.UserModel;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,7 @@ namespace FS.HotelBooking.API.Controllers
 {
     [Route("api/users")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private IUserService _service;

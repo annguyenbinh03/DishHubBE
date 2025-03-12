@@ -1,6 +1,7 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Group6.NET1704.SW392.AIDiner.Services.Hubs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -9,6 +10,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
 {
     [Route("api/orders")]
     [ApiController]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         private IOrderService _orderService;

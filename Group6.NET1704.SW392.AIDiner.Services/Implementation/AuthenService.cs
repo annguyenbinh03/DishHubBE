@@ -54,7 +54,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             {
                 new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString() ?? string.Empty),
-                new Claim(ClaimTypes.Role, user.RoleId == 1 ? "User" : user.RoleId == 2 ? "Manager" : "Admin"),
+                new Claim(ClaimTypes.Role, user.RoleId == 1 ? "Staff" : "Manager"),
                 new Claim("RoleId", user.RoleId.ToString() ?? string.Empty),
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
             };

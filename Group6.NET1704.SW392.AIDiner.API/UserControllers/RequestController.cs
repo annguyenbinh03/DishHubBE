@@ -9,6 +9,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
 {
     [Route("api/requests")]
     [ApiController]
+    [Authorize]
     public class RequestController : ControllerBase
     {
         private IRequestService _requestService;

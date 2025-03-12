@@ -1,11 +1,13 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Group6.NET1704.SW392.AIDiner.API.AdminController
 {
     [Route("api/dashboard")]
     [ApiController]
+    [Authorize(Roles = "Manager")]
     public class AdminDashboardController
     {
         private readonly IDashboardService _dashboardService;

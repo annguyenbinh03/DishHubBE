@@ -3,11 +3,13 @@ using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Group6.NET1704.SW392.AIDiner.API.AdminController
 {
     [Route("api/admin")]
     [ApiController]
+    [Authorize(Roles = "Manager")]
     public class AdminCategoryController : ControllerBase
     {
         private ICategoryService _categoryService;

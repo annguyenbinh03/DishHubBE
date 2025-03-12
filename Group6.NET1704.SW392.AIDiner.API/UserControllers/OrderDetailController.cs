@@ -1,6 +1,7 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.Common.Request;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -9,6 +10,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
 {
     [Route("api")]
     [ApiController]
+    [Authorize]
     public class OrderDetailController : ControllerBase
     {
         public IOrderDetailService _orderDetailService;
