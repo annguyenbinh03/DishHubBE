@@ -1,4 +1,5 @@
-﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+﻿using Google.Apis.Auth.OAuth2.Requests;
+using Group6.NET1704.SW392.AIDiner.Common.DTO;
 using Group6.NET1704.SW392.AIDiner.Common.DTO.Request;
 using Group6.NET1704.SW392.AIDiner.Common.Model.RegisterLoginModel;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
@@ -7,8 +8,11 @@ using Group6.NET1704.SW392.AIDiner.Services.Implementation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using TokenRequest = Group6.NET1704.SW392.AIDiner.Common.DTO.TokenRequest;
 
 namespace Group6.NET1704.SW392.AIDiner.API.Controllers
 {
@@ -91,7 +95,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
         }
 
         [HttpGet("user-info")]
-        [Authorize] 
+        [Authorize]
         public IActionResult GetUserInfo()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -119,6 +123,50 @@ namespace Group6.NET1704.SW392.AIDiner.API.Controllers
             var response = await _authenService.LoginGoogle(model);
 
             return Ok(response);
+        }
+
+        [HttpPost("validate")]
+        public IActionResult ValidateToken([FromBody] TokenRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Token))
+            {
+                return BadRequest(new { message = "Token is required." });
+            }
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+
+                if (!handler.CanReadToken(request.Token))
+                {
+                    return BadRequest(new { message = "Invalid token format." });
+                }
+
+                var jwtToken = handler.ReadJwtToken(request.Token);
+
+                // Lấy thời gian hết hạn từ "exp" claim
+                var expClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+                if (expClaim == null)
+                {
+                    return BadRequest(new { message = "Token does not contain expiration (exp) claim." });
+                }
+
+                var expDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expClaim)).UtcDateTime;
+                var currentTime = DateTime.UtcNow;
+
+                string formattedExpDate = expDate.ToString("yyyy-MM-dd HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
+
+                if (expDate < currentTime)
+                {
+                    return Unauthorized(new { message = "Token has expired.", Expiration = formattedExpDate });
+                }
+
+                return Ok(new { message = "Token is valid.", Expiration = formattedExpDate });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error processing token.", error = ex.Message });
+            }
         }
     }
 }
