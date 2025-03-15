@@ -160,33 +160,24 @@ builder.Services.AddSwaggerGen(options =>
 // Cấu hình CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()  // Cho phép tất cả các origin
-              .AllowAnyMethod()  // Cho phép tất cả các phương thức HTTP (GET, POST, PUT, DELETE, v.v.)
-              .AllowAnyHeader(); // Cho phép tất cả các header
+        policy.WithOrigins("http://localhost:3000") // 🔄 Chỉ cho phép React truy cập (chỉnh sửa lại từ AllowSpecificOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // ✅ Quan trọng nếu sử dụng cookie/token
     });
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigins", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000") // Chỉ cho phép React truy cập
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials(); // Bắt buộc có nếu gửi credentials (cookie/token)
-    });
-});
 
 builder.Services.AddSignalR();
 
 // Chỉ gọi Build() MỘT LẦN
 var app = builder.Build();
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 
-app.MapHub<OrderDetailHub>("/hub/order-details").RequireCors("AllowSpecificOrigins");
-app.MapHub<RequestHub>("/hub/requests").RequireCors("AllowSpecificOrigins");
+app.MapHub<OrderDetailHub>("/hub/order-details").RequireCors("AllowFrontend");
+app.MapHub<RequestHub>("/hub/requests").RequireCors("AllowFrontend");
 
 // Cấu hình pipeline của ứng dụng
 //if (app.Environment.IsDevelopment())
