@@ -11,6 +11,9 @@ using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Group6.NET1704.SW392.AIDiner.Services.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Group6.NET1704.SW392.AIDiner.Services.Util;
 
 namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 {
@@ -20,13 +23,15 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
         private IGenericRepository<Request> _requestRepository;
         private IGenericRepository<Order> _orderRepository;
         private IGenericRepository<RequestType> _requestTypeRepository;
+        private readonly IHubContext<RequestHub> _requestHubContext;
 
-        public RequestService(IUnitOfWork unitOfWork, IGenericRepository<Request> requestRepository, IGenericRepository<Order> orderRepository, IGenericRepository<RequestType> requestTypeRepository)
+        public RequestService(IUnitOfWork unitOfWork, IGenericRepository<Request> requestRepository, IGenericRepository<Order> orderRepository, IGenericRepository<RequestType> requestTypeRepository, IHubContext<RequestHub> requestHubContext)
         {
             _unitOfWork = unitOfWork;
             _requestRepository = requestRepository;
             _orderRepository = orderRepository;
             _requestTypeRepository = requestTypeRepository;
+            _requestHubContext = requestHubContext;
         }
 
         public async Task<ResponseDTO> GetAllRequest(int restaurantId)
@@ -36,7 +41,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             {
                 if (restaurantId > 0)
                 {
-                        var requests = await _requestRepository.GetQueryable().Include(r => r.Type)
+                        var requests = await _requestRepository.GetQueryable().Include(r => r.Type).OrderBy(r => r.CreatedAt).Reverse()
                        .Include(r => r.Order)
                        .ThenInclude(o => o.Table)
                        .ThenInclude(t => t.Restaurant)
@@ -57,7 +62,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 }
                 else
                 {
-                      var requests = await _requestRepository.GetQueryable().Include(r => r.Type)
+                      var requests = await _requestRepository.GetQueryable().Include(r => r.Type).OrderBy(r => r.CreatedAt).Reverse()
                      .Select(r => new
                      {
                          r.Id,
@@ -87,10 +92,11 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
         public async Task<ResponseDTO> UpdateRequestStatus(int requestId, string status)
         {
+            //Status IN ('pending', 'inProgress', 'completed', 'cancelled')
             ResponseDTO response = new ResponseDTO();
             try
             {
-                var request = await _requestRepository.GetQueryable().Include(r => r.Order).Include(r => r.Type).FirstOrDefaultAsync(r => r.Id == requestId);
+                var request = await _requestRepository.GetByIdAsync(requestId, includes: r => r.Order.Table.Restaurant);
                 if (request == null)
                 {
                     response.IsSucess = false;
@@ -107,7 +113,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     return response;
                 }
                 request.Status = status;
-                request.ProcessedAt = DateTime.UtcNow;
+                request.ProcessedAt = TimeZoneUtil.GetCurrentTime();
 
                 await _requestRepository.Update(request);
                 await _unitOfWork.SaveChangeAsync();
@@ -124,6 +130,15 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     request.Note,
                     request.Status
                 };
+
+                var updateStateRequestHubResponse = new
+                {
+                    id = request.Id,
+                    status = request.Status
+                };
+
+                var restauratnId = request.Order.Table.Restaurant.Id;
+                await _requestHubContext.Clients.Group(restauratnId.ToString()).SendAsync("UpdateRequestStatus", updateStateRequestHubResponse);
             }
             catch (Exception ex)
             {
@@ -214,7 +229,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     OrderId = requestDto.OrderId,
                     TypeId = requestDto.TypeId,
                     Note = requestDto.Note,
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = TimeZoneUtil.GetCurrentTime(),
                     Status = "pending"
                 };
 
@@ -232,6 +247,28 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Note = newRequest.Note,
                     Status = newRequest.Status
                 };
+
+                Request? createdRequest = await _requestRepository.GetByIdAsync(newRequest.Id, r => r.Type, r => r.Order.Table.Restaurant);
+
+
+                if (createdRequest != null)
+                {
+                    var newRequestHubResponse = new
+                    {
+                        id = createdRequest.Id,
+                        orderId = createdRequest.Order.Id,
+                        typeId = createdRequest.Type.Id,
+                        typeName = createdRequest.Type.Name,
+                        note = createdRequest.Note,
+                        createdAt = createdRequest.CreatedAt.HasValue ? createdRequest.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
+                        processedAt = createdRequest.ProcessedAt.HasValue ? createdRequest.ProcessedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : null,
+                        status = createdRequest.Status,
+                        tableName = createdRequest.Order.Table.Name
+                    };
+
+                    var restauratnId = createdRequest.Order.Table.Restaurant.Id;
+                    await _requestHubContext.Clients.Group(restauratnId.ToString()).SendAsync("ReceiveNewRequest", newRequestHubResponse);
+                }
             }
             catch (Exception ex)
             {

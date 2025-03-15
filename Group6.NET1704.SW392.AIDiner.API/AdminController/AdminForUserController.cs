@@ -12,7 +12,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
 {
     [Route("api/admin")]
     [ApiController]
-    [Authorize(Roles = "Manager")]
+    //[Authorize(Roles = "Manager")]
     public class AdminForUserController : ControllerBase
     {
         private IUserService _service;

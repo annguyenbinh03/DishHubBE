@@ -14,6 +14,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Group6.NET1704.SW392.AIDiner.Services.Util;
 
 
 namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
@@ -56,7 +57,8 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Image = createDishDTO.Image,
                     Status = createDishDTO.Status.ToLower(),
                     RestaurantId = createDishDTO.RestaurantId,
-                    DishIngredients = new List<DishIngredient>()
+                    DishIngredients = new List<DishIngredient>(),
+                    CreatedAt = TimeZoneUtil.GetCurrentTime()
 
                 };
                 foreach (var ingredientId in createDishDTO.Ingredients)

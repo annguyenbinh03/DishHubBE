@@ -8,7 +8,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
 {
     [Route("api/requests/history")]
     [ApiController]
-    [Authorize(Roles = "Manager")]
+    [Authorize]
     public class AdminForRequestController : ControllerBase
     {
         private IRequestService _requestService;

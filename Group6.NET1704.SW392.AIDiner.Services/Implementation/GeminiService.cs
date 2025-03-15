@@ -15,7 +15,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
-        private const string BaseUrl = "https://generativelanguage.googleapis.com/v1beta/tunedModels/dishhub-ehe7hbwueb2e:generateContent"; // Thay đổi theo mô hình và endpoint bạn sử dụng
+        private const string BaseUrl = "https://generativelanguage.googleapis.com/v1beta/tunedModels/test-wstv88ojhwxe:generateContent"; // Thay đổi theo mô hình và endpoint bạn sử dụng
 
         public GeminiService(string apiKey) // Sử dụng DI nếu có thể.
         {
@@ -25,21 +25,43 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
         public async Task<GeminiResponse> ProcessUserMessage(string message)
         {
+//            string prePrompt = @"Trả dữ liệu với dạng sau {
+//  ""type"": ""object"",
+//  ""properties"": {
+//    ""Intent"": {
+//      ""type"": ""string""
+//    },
+//    ""FoodId"": {
+//      ""type"": ""integer""
+//    },
+//    ""Quantity"": {
+//      ""type"": ""integer""
+//    },
+//    ""ResponseText"": {
+//      ""type"": ""string""
+//    }
+//  },
+//  ""required"": [
+//    ""Intent"",
+//    ""ResponseText""
+//  ]
+//}";
+
             var payload = new
             {
                 contents = new[]
                 {
-        new
-        {
-            parts = new[]
+                    new
+                    {
+                        parts = new[]
             {
-                new
-                {
-                    text = message
-                }
-            }
-        }
-    },
+                            new
+                            {
+                                text = message
+                            }
+                        }
+                    }
+                },
                 generationConfig = new
                 {
                     temperature = 0

@@ -3,6 +3,7 @@ using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Group6.NET1704.SW392.AIDiner.Services.Util;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -41,15 +42,17 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     dto.BusinessCode = BusinessCode.INVALID_INPUT;
                     return dto;
                 }
-                Order newOrder = new Order
-                {
-                    //CustomerId = request.CustomerId,
-                    TableId = request.TableId,
-                    TotalAmount = request.TotalAmount,
-                    PaymentStatus = request.PaymentStatus,
-                    CreatedAt = DateTime.Now,
-                    Status = request.Status,
-                };
+                    Order newOrder = new Order
+                    {
+                        //CustomerId = request.CustomerId,
+                        TableId = request.TableId,
+                        TotalAmount = request.TotalAmount,
+                        PaymentStatus = request.PaymentStatus,
+                        CreatedAt = TimeZoneUtil.GetCurrentTime(),
+                        Status = request.Status,
+                    };
+
+                Console.WriteLine(TimeZoneUtil.GetCurrentTime());
 
                 // Lưu vào database
                 await _orderRepository.Insert(newOrder);
@@ -85,7 +88,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     TableId = request.TableId,
                     TotalAmount = 0,
                     //PaymentStatus = 0, // Default payment status
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = TimeZoneUtil.GetCurrentTime(),
                     Status = "pending"
                 };
 

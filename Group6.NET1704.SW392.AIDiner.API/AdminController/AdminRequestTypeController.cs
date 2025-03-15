@@ -9,7 +9,6 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
 {
     [Route("api/admin/request-types")]
     [ApiController]
-    [Authorize(Roles = "Manager")]
     public class AdminRequestTypeController : ControllerBase
     {
         private IRequestTypeService _requestTypeService;
@@ -18,21 +17,25 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
         {
             _requestTypeService = requestTypeService;
         }
+        [Authorize]
         [HttpGet]
         public async Task<ResponseDTO> GetAllRequestTypesForAdmin()
         {
             return await _requestTypeService.GetAllRequestTypesForAdmin();
         }
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public async Task<ResponseDTO> CreateRequestTypeForAdmin([FromBody] string name)
         {
             return await _requestTypeService.CreateRequestTypeForAdmin(name);
         }
+        [Authorize(Roles = "Manager")]
         [HttpPut("{id}")]
         public async Task<ResponseDTO> UpdateRequestTypeForAdmin(int id, [FromBody] string name)
         {
             return await _requestTypeService.UpdateRequestTypeForAdmin(id, name);
         }
+        [Authorize(Roles = "Manager")]
         [HttpDelete("{id}")]
         public async Task<ResponseDTO> DeleteRequestTypeForAdmin(int id)
         {

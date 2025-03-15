@@ -12,6 +12,7 @@ using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Implementation;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Group6.NET1704.SW392.AIDiner.Services.Util;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -66,7 +67,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             issuer: _configuration["JwtConfig:Issuer"],
             audience: _configuration["JwtConfig:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(30),
+            expires: TimeZoneUtil.GetCurrentTime().AddMinutes(19 * 60), //from 7 to 22
             signingCredentials: creds);
 
 
@@ -96,7 +97,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Dob = model.Dob,
                     PhoneNumber = model.PhoneNumber,
                     RoleId = 1,
-                    CreateAt = DateTime.UtcNow,
+                    CreateAt = TimeZoneUtil.GetCurrentTime(),
                     Address = model.Address,
                     //Status = true,
                     Avatar = model.Avatar
@@ -136,7 +137,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             issuer: _configuration["JwtConfig:Issuer"],
             audience: _configuration["JwtConfig:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(30),
+            expires: TimeZoneUtil.GetCurrentTime().AddMinutes(19 * 60), //from 6 am to 22 am
             signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

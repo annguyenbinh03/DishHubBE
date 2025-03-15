@@ -75,7 +75,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
             string hostName = System.Net.Dns.GetHostName();
             string clientIPAddress = System.Net.Dns.GetHostAddresses(hostName).GetValue(0).ToString();
             string infor = "Thanh toan cho orderId: " + orderId.ToString();
-            string tnxRef = DateTime.Now.ToString("ddHHmmssyyyy");
+            string tnxRef = TimeZoneUtil.GetCurrentTime().ToString("ddHHmmssyyyy");
             tnxRef = tnxRef + orderId.ToString();
 
             string vnp_Amount = ((int)amount).ToString() + "00";
@@ -86,7 +86,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
             pay.AddRequestData("vnp_TmnCode",_vNPaySettings.TmnCode);
             pay.AddRequestData("vnp_Amount", vnp_Amount);
             pay.AddRequestData("vnp_BankCode", "");
-            pay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            pay.AddRequestData("vnp_CreateDate", TimeZoneUtil.GetCurrentTime().ToString("yyyyMMddHHmmss"));
             pay.AddRequestData("vnp_CurrCode", "VND");
             pay.AddRequestData("vnp_IpAddr", clientIPAddress);
             pay.AddRequestData("vnp_Locale", "vn");
@@ -151,7 +151,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
                         OrderId = orderId,
                         MethodId = 1,
                         TransactionCode = vnpayTranId.ToString(),
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = TimeZoneUtil.GetCurrentTime(),
                         Amount = amount,
                         Description = $"Thanh toán thành công cho orderId {orderId}",
                         Status = true,
@@ -179,7 +179,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
                         OrderId = orderId,
                         MethodId = 1,
                         TransactionCode = vnpayTranId.ToString(),
-                        CreatedAt = DateTime.UtcNow,
+                        CreatedAt = TimeZoneUtil.GetCurrentTime(),
                         Amount = amount,
                         Description = $"Thanh toán thất bại cho orderId {orderId}",
                         Status = false,

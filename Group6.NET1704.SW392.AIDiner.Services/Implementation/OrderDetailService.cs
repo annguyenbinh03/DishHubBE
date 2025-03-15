@@ -5,6 +5,7 @@ using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Group6.NET1704.SW392.AIDiner.Services.Hubs;
+using Group6.NET1704.SW392.AIDiner.Services.Util;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Query;
@@ -140,6 +141,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         Status = "pending"
                     };
                     orderDetails.Add(orderDetail);
+                    totalAmount += orderDetail.Price;
                 }
 
                 if (orderDetails.Count > 0)
@@ -173,7 +175,19 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
                 foreach(var od in orderDetails)
                 {
-                   await _orderHubContext.Clients.Group(restaurantId.ToString()).SendAsync("ReceiveNewOrder", od);
+                    var createOrderDetailHubReponse = new
+                    {
+                        Id = od.Id,
+                        OrderId = orderId,
+                        DishId = od.DishId,
+                        DishName = od.Dish.Name,
+                        DishImage = od.Dish.Image,
+                        TableName = tableName,
+                        Quantity = od.Quantity,
+                        Price = od.Price,
+                        Status = od.Status,
+                    };
+                   await _orderHubContext.Clients.Group(restaurantId.ToString()).SendAsync("ReceiveNewOrder", createOrderDetailHubReponse);
                 }           
             }
             catch (Exception)
@@ -223,7 +237,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
                 var updateOrderDetailStatus = new
                 {
-                    orderDetailId = orderDetailId,
+                    id = orderDetail.Id,
                     status = orderDetail.Status,
                 };
 
@@ -243,7 +257,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
         public async Task<List<OrderDetailHubResponse>> getRestaurantCurrentOrderDetail(int restaurantId)
         {
-            var today = DateTime.Today;
+            var today = TimeZoneUtil.GetCurrentTime();
             var querryData = await _orderDetailRepositoy.GetAllDataByExpression(od =>
                 od.Order.Table.Restaurant.Id == restaurantId /*&& od.Order.CreatedAt == today*/ , null, null, includes: new Expression<Func<OrderDetail, object>>[]
     {

@@ -13,6 +13,7 @@ using Group6.NET1704.SW392.AIDiner.DAL.Repositories;
 using Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay;
 using Group6.NET1704.SW392.AIDiner.Services.BusinessObjects;
 using Group6.NET1704.SW392.AIDiner.Services.Hubs;
+using Group6.NET1704.SW392.AIDiner.Services.Util;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +45,8 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 
+//Dang ky timezone
+
 var configuration = builder.Configuration;
 
 builder.Services.Configure<VNPaySettings>(configuration.GetSection("VNPaySettings"));
@@ -55,7 +58,6 @@ builder.Services.AddSwaggerGen();
 // Đăng ký DbContext
 builder.Services.AddDbContext<DishHub5Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 
 // Lấy cấu hình JWT từ appsettings.json
 var jwtIssuer = builder.Configuration["JwtConfig:Issuer"];

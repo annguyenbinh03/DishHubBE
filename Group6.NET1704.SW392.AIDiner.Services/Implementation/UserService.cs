@@ -6,6 +6,7 @@ using Group6.NET1704.SW392.AIDiner.Common.UserModel;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Group6.NET1704.SW392.AIDiner.Services.Util;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                var query = _userRepository.GetQueryable().AsQueryable();
+                    var query = _userRepository.GetQueryable().AsQueryable();
 
                 query = query.Include(u => u.Role);
 
@@ -51,7 +52,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
                 int totalUsers = await query.CountAsync();
                 int totalPages = (int)Math.Ceiling(totalUsers / (double)size);
-                var users = await query.Skip((page - 1) * size).Take(size).ToListAsync();
+                List<User> users = await query.Skip((page - 1) * size).Take(size).ToListAsync();
 
                 dto.Data = new
                 {
@@ -321,7 +322,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Address = model.Address,
                     Avatar = model.Avatar,
                     IsDeleted = false,
-                    CreateAt = DateTime.UtcNow
+                    CreateAt = TimeZoneUtil.GetCurrentTime()
                 };
 
                 await _userRepository.Insert(newUser);
