@@ -1,5 +1,8 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
+using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Group6.NET1704.SW392.AIDiner.Services.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,17 +13,64 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 {
     public class DashboardService : IDashboardService
     {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public DashboardService(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
         public async Task<ResponseDTO> GetSalesInfo(int restaurantId)
         {
-           ResponseDTO response = new ResponseDTO();
-            response.IsSucess = true;
-            response.Data = new
+            var tables = await _unitOfWork.Tables.GetAllDataByExpression(
+                filter: t => t.RestaurantId == restaurantId, 
+                pageNumber: null,
+                pageSize: null
+            );
+
+            var tableIds = tables.Items.Select(t => t.Id).ToList();
+            if (!tableIds.Any())
             {
-                dailySales = 2300000,
-                monthlySales = 95300000,
-                yearlySales = 342000000
+                return new ResponseDTO
+                {
+                    IsSucess = true,
+                    Data = new { DailySales = 0, MonthlySales = 0, YearlySales = 0 },
+                    BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY,
+                    message = "Không có bàn nào trong nhà hàng này!"
+                };
+            }
+
+            var orders = await _unitOfWork.Orders.GetAllDataByExpression(
+                filter: o => tableIds.Contains(o.TableId) && o.Status == "completed", 
+                pageNumber: null,
+                pageSize: null
+            );
+            var currentTime = TimeZoneUtil.GetCurrentTime(); 
+            var today = currentTime.Date; 
+            var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
+            var firstDayOfYear = new DateTime(today.Year, 1, 1);
+
+            var salesData = new
+            {
+                DailySales = orders.Items
+                    .Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value.Date == today)
+                    .Sum(o => o.TotalAmount),
+
+                MonthlySales = orders.Items
+                    .Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value >= firstDayOfMonth)
+                    .Sum(o => o.TotalAmount),
+
+                YearlySales = orders.Items
+                    .Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value >= firstDayOfYear)
+                    .Sum(o => o.TotalAmount)
             };
-            return response;
+
+            return new ResponseDTO
+            {
+                IsSucess = true,
+                Data = salesData,
+                BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY, 
+                message = "Thống kê doanh thu thành công!"
+            };
         }
 
         public async Task<ResponseDTO> GetTopDishesInfo(int restaurantId)
