@@ -7,6 +7,12 @@ public interface IUnitOfWork
 {
     IRestaurantRepository Restaurants {  get; }
     IUserRepository Users {  get; }
+
+    IGenericRepository<Order> Orders { get; }
+
+    IGenericRepository<Table> Tables { get; }
+    IGenericRepository<OrderDetail> OrderDetails { get; }
+
     public Task<int> SaveChangeAsync();
     IGenericRepository<DishIngredient> DishIngredientRepository { get; }
 }

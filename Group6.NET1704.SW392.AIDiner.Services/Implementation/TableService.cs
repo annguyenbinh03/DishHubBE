@@ -69,7 +69,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     pageSize: 0,
                     orderBy: null,
                     isAscending: true,
-                    includes: t => t.Restaurant 
+                    includes: t => t.Restaurant
                 );
 
                 dto.Data = tables.Items.Select(d => new TableAdminDTO
@@ -126,7 +126,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Name = createTableDTO.Name,
                     Description = createTableDTO.Description,
                     RestaurantId = createTableDTO.RestaurantId,
-                    CreatedAt = DateTime.UtcNow,  
+                    CreatedAt = DateTime.UtcNow,
                     IsDeleted = false,
                     Status = "available"
                 };
@@ -141,8 +141,8 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     CreatedAt = createdTable.CreatedAt,
                     IsDeleted = createdTable.IsDeleted,
                     RestaurantId = createdTable.RestaurantId,
-                    RestaurantName = restaurant.Name,   
-                    RestaurantImage = restaurant.Image 
+                    RestaurantName = restaurant.Name,
+                    RestaurantImage = restaurant.Image
                 };
 
                 await _unitOfWork.SaveChangeAsync();
@@ -237,6 +237,101 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 
             return dto;
         }
+
+        public async Task<ResponseDTO> TableInfoForStaff(int restaurantId)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                var tables = await _tableRepository.GetAllDataByExpression(
+                                         filter: t => t.RestaurantId == restaurantId,
+                                         pageNumber: null,
+                                         pageSize: null
+                                     );
+
+                var response = new List<object>();
+
+                // Lặp qua từng bàn
+                foreach (var table in tables.Items)
+                {
+                    // Tìm order đầu tiên có trạng thái 'inProgress' cho bàn này
+                    var firstInProgressOrder = await _unitOfWork.Orders.GetByExpression(
+                        filter: o => o.TableId == table.Id && o.Status == "inProgress",
+                        includeProperties: o => o.OrderDetails
+                    );
+
+                    object tableResponse; // Declare tableResponse outside if/else
+
+                    if (firstInProgressOrder != null)
+                    {
+                        // Parse dữ liệu qua var trước khi thêm vào response
+                        tableResponse = new
+                        {
+                            Table = new
+                            {
+                                table.Id,
+                                table.Name,
+                                table.Description,
+                                table.CreatedAt,
+                                table.Status,
+                                table.IsDeleted,
+                                table.RestaurantId,
+                                    Order = new
+                                    {
+                                        firstInProgressOrder.Id,
+                                        firstInProgressOrder.TableId,
+                                        firstInProgressOrder.TotalAmount,
+                                        firstInProgressOrder.PaymentStatus,
+                                        firstInProgressOrder.CreatedAt,
+                                        firstInProgressOrder.Status,
+                                        OrderDetails = firstInProgressOrder.OrderDetails.Select(od => new
+                                        {
+                                            od.Id,
+                                            od.OrderId,
+                                            od.DishId,
+                                            od.Quantity,
+                                            od.Price,
+                                            od.Status,
+                                            od.Note
+                                        })
+                                    },                            
+                            },
+
+                        };
+                    }
+                    else
+                    {
+                        tableResponse = new
+                        {
+                            Table = new
+                            {
+                                table.Id,
+                                table.Name,
+                                table.Description,
+                                table.CreatedAt,
+                                table.Status,
+                                table.IsDeleted,
+                                table.RestaurantId,
+                                Order = (object)null, // Đặt order là null
+                            },
+                            
+                        };
+                    }
+                    response.Add(tableResponse);
+                }
+
+                dto.Data = response;
+                dto.IsSucess = true;
+                return dto;
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Data = ex.Message;
+            }
+            return dto;
+        }
     }
-    }
+}
 

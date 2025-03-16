@@ -14,12 +14,21 @@ public class UnitOfWork : IUnitOfWork
 
     public IGenericRepository<DishIngredient> DishIngredientRepository { get; private set; }
 
-    public UnitOfWork(DishHub5Context context, IRestaurantRepository restaurantRepository, IUserRepository userRepository)
+    public IGenericRepository<Order> Orders { get; private set; }
+
+    public IGenericRepository<Table> Tables { get; private set; }
+
+    public IGenericRepository<OrderDetail> OrderDetails { get; private set; }
+
+    public UnitOfWork(DishHub5Context context, IRestaurantRepository restaurantRepository, IUserRepository userRepository, IGenericRepository<Order> orderRepository, IGenericRepository<Table> tableRepository, IGenericRepository<OrderDetail> orderDetails)
     {
         _context = context;
         DishIngredientRepository = new GenericRepository<DishIngredient>(_context);
         Restaurants = restaurantRepository;
         Users = userRepository;
+        Orders = orderRepository;
+        Tables = tableRepository;
+        OrderDetails = orderDetails;
     }
 
     public async Task<int> SaveChangeAsync()

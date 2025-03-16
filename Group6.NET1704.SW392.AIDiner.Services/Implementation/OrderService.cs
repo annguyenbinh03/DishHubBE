@@ -112,23 +112,43 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             return dto;
         }
 
-        public async Task<ResponseDTO> GetAllOrder()
+        public async Task<ResponseDTO> GetAllOrder(int restaurantId)
         {
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                var orders = await _orderRepository.GetAllDataByExpression(null, 0, 0, null, true,
-                     includes: new Expression<Func<Order, object>>[] { b => b.Table });
-                dto.Data = orders.Items.Select(x => new OrderDTO
+
+                if(restaurantId != 0)
                 {
-                    Id = x.Id,
-                    //CustomerId = x.CustomerId,
-                    TableId = x.TableId,
-                    TotalAmount = x.TotalAmount,
-                    PaymentStatus = x.PaymentStatus,
-                    CreatedAt = x.CreatedAt,
-                    Status = x.Status,
-                }).ToList();
+                    var orders = await _orderRepository.GetAllDataByExpression(o => o.Table.RestaurantId == restaurantId, 0, 0, null, true,
+                  includes: new Expression<Func<Order, object>>[] { b => b.Table });
+                    dto.Data = orders.Items.Select(x => new OrderDTO
+                    {
+                        Id = x.Id,
+                        //CustomerId = x.CustomerId,
+                        TableId = x.TableId,
+                        TotalAmount = x.TotalAmount,
+                        PaymentStatus = x.PaymentStatus,
+                        CreatedAt = x.CreatedAt,
+                        Status = x.Status,
+                    }).ToList();
+                }
+                else
+                {
+                    var orders = await _orderRepository.GetAllDataByExpression(null, 0, 0, null, true,
+                   includes: new Expression<Func<Order, object>>[] { b => b.Table });
+                    dto.Data = orders.Items.Select(x => new OrderDTO
+                    {
+                        Id = x.Id,
+                        //CustomerId = x.CustomerId,
+                        TableId = x.TableId,
+                        TotalAmount = x.TotalAmount,
+                        PaymentStatus = x.PaymentStatus,
+                        CreatedAt = x.CreatedAt,
+                        Status = x.Status,
+                    }).ToList();
+                }
+               
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
 

@@ -19,9 +19,9 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
         }
 
         [HttpGet("orders")]
-        public async Task<ResponseDTO> GetAllOrder()
+        public async Task<ResponseDTO> GetAllOrder(int restaurantId = 0)
         {
-            return await _orderService.GetAllOrder();
+            return await _orderService.GetAllOrder(restaurantId);
         }
 
 
