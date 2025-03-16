@@ -50,6 +50,12 @@ namespace Group6.NET1704.SW392.AIDiner.API.AdminController
         public async Task<ResponseIsSucessDTO> DeleteTableForAdmin(int id)
         {
             return await (_service.DeleteTableForAdmin(id));
-        }  
+        }
+
+        [HttpGet("tables-infor")]
+        public async Task<ResponseDTO> TableInfoForId(int tableId)
+        {
+            return await _service.TableInfoForId(tableId);
+        }
     }
 }

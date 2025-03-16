@@ -18,5 +18,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
         public Task<ResponseIsSucessDTO> DeleteTableForAdmin(int id);
 
         public Task<ResponseDTO> TableInfoForStaff(int restaurantId);
+
+        public Task<ResponseDTO> TableInfoForId(int tableId);
     }
 }
