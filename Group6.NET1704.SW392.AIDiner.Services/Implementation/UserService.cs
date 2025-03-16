@@ -152,6 +152,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 if (userDTO.Address != null) existingUser.Address = userDTO.Address;
                 if (userDTO.IsDeleted.HasValue) existingUser.IsDeleted = userDTO.IsDeleted.Value;
                 if (userDTO.Avatar != null) existingUser.Avatar = userDTO.Avatar;
+                if (userDTO.Password != null) existingUser.Password = BCrypt.Net.BCrypt.HashPassword(userDTO.Password); 
 
                 if (await _userRepository.ExistsAsync(u => u.Username == existingUser.Username && u.Id != existingUser.Id))
                     return new ResponseDTO { IsSucess = false, BusinessCode = BusinessCode.USERNAME_ALREADY_EXISTS };
@@ -181,7 +182,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         Address = existingUser.Address,
                         IsDeleted = existingUser.IsDeleted,
                         Avatar = existingUser.Avatar,
-
                     }
                 };
             }

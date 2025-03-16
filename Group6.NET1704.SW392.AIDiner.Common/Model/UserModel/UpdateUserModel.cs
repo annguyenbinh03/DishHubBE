@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Group6.NET1704.SW392.AIDiner.Common.Model.RegisterLoginModel;
 
@@ -28,6 +29,9 @@ namespace Group6.NET1704.SW392.AIDiner.Common.UserModel
 
         public string? Avatar { get; set; }
 
-       
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string? Password { get; set; }
+
+
     }
 }
