@@ -19,8 +19,11 @@ public class UnitOfWork : IUnitOfWork
     public IGenericRepository<Table> Tables { get; private set; }
 
     public IGenericRepository<OrderDetail> OrderDetails { get; private set; }
+    public IGenericRepository<Payment> Payments { get; private set; }
+    public IGenericRepository<Dish> Dishes { get; private set; }
 
-    public UnitOfWork(DishHub5Context context, IRestaurantRepository restaurantRepository, IUserRepository userRepository, IGenericRepository<Order> orderRepository, IGenericRepository<Table> tableRepository, IGenericRepository<OrderDetail> orderDetails)
+
+    public UnitOfWork(DishHub5Context context, IRestaurantRepository restaurantRepository, IUserRepository userRepository, IGenericRepository<Order> orderRepository, IGenericRepository<Table> tableRepository, IGenericRepository<OrderDetail> orderDetails, IGenericRepository<Payment> payments, IGenericRepository<Dish> dish)
     {
         _context = context;
         DishIngredientRepository = new GenericRepository<DishIngredient>(_context);
@@ -29,6 +32,8 @@ public class UnitOfWork : IUnitOfWork
         Orders = orderRepository;
         Tables = tableRepository;
         OrderDetails = orderDetails;
+        Payments = payments;
+        Dishes = dish;
     }
 
     public async Task<int> SaveChangeAsync()

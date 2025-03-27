@@ -13,6 +13,7 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO.AdminDTO
         public string? Description { get; set; }
         public DateTime? CreatedAt { get; set; }
         public bool IsDeleted { get; set; }
+        public string Status { get; set; } = null!;
         public int RestaurantId { get; set; }
         public string RestaurantName { get; set; } = null!;
         public string? RestaurantImage { get; set; }

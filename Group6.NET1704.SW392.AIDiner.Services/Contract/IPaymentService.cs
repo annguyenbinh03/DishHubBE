@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
     {
         Task<ResponseDTO> GetPayments(int? restaurantId);
         Task<ResponseDTO> GetPaymentByRestaurantId(int? restaurantId);
+        Task<ResponseDTO> PaidByCash(PaidByCashRequest request);
 
     }
 

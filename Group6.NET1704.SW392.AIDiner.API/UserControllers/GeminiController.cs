@@ -26,7 +26,7 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
             }
 
             // 1. Gọi Gemini để phân tích tin nhắn
-            GeminiResponse geminiResponse = await _geminiService.ProcessUserMessage(request.Message);
+            GeminiResponse geminiResponse = await _geminiService.ProcessUserMessage(request.Message, request.orderId);
 
             if (geminiResponse == null)
             {
@@ -37,16 +37,10 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
             switch (geminiResponse.Intent)
             {
                 case "OrderFood":
-                    if (string.IsNullOrEmpty(geminiResponse.FoodId))
-                    {
-                        return BadRequest("FoodId is required for OrderFood intent.");
-                    }
 
-                    if (!int.TryParse(geminiResponse.Quantity, out int quantity))
-                    {
-                        quantity = 1; // Mặc định là 1 nếu không có số lượng
-                    }
-                    return Ok(new { Message = geminiResponse.ResponseText + $"đã đặt món {geminiResponse.FoodId} - {quantity} " }); // Sử dụng ResponseText (hoặc thuộc tính phù hợp)
+                    var reponse = await _geminiService.OrderFood(geminiResponse);
+
+                    return Ok(new { Message = reponse }); // Sử dụng ResponseText (hoặc thuộc tính phù hợp)
 
                     break;
 

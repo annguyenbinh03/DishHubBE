@@ -1,4 +1,5 @@
 ﻿using Group6.NET1704.SW392.AIDiner.Common.DTO;
+using Group6.NET1704.SW392.AIDiner.Common.Request;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
 using Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay;
@@ -47,6 +48,13 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
         public async Task<IActionResult> GetPaymentByRestaurantId([FromQuery] int? restaurantId)
         {
             var resultList = await _paymentService.GetPaymentByRestaurantId(restaurantId);
+            return Ok(resultList);
+        }
+
+        [HttpPost("pay/cash")]
+        public async Task<IActionResult> PaidByCash([FromBody] PaidByCashRequest request)
+        {
+            var resultList = await _paymentService.PaidByCash(request);
             return Ok(resultList);
         }
 

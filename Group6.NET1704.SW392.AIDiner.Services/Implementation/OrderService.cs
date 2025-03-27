@@ -3,6 +3,7 @@ using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.Contract;
+using Group6.NET1704.SW392.AIDiner.Services.Enums;
 using Group6.NET1704.SW392.AIDiner.Services.Util;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -49,7 +50,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         TotalAmount = request.TotalAmount,
                         PaymentStatus = request.PaymentStatus,
                         CreatedAt = TimeZoneUtil.GetCurrentTime(),
-                        Status = request.Status,
+                        Status = "inProgress",
                     };
 
                 Console.WriteLine(TimeZoneUtil.GetCurrentTime());
@@ -82,15 +83,22 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     dto.message = "Invalid table ID";
                     return dto;
                 }
+                var table = await _unitOfWork.Tables.GetByIdAsync(request.TableId);
 
+                if(table != null && table.Status.Equals("occupied"))
+                {
+                    throw new Exception("Bàn đang có một đơn hàng khác (occupied). Hãy kết thúc đơn hàng ở bàn này trước!");
+                }
                 Order newOrder = new Order
                 {
                     TableId = request.TableId,
                     TotalAmount = 0,
                     //PaymentStatus = 0, // Default payment status
                     CreatedAt = TimeZoneUtil.GetCurrentTime(),
-                    Status = "pending"
+                    Status = OrderStatus.inProgress.ToString()
                 };
+
+                table.Status = TableStatus.occupied.ToString();
 
                 await _orderRepository.Insert(newOrder);
                 await _unitOfWork.SaveChangeAsync();

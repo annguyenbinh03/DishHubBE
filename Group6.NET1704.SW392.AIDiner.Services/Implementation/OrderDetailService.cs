@@ -109,7 +109,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             ResponseDTO dto = new ResponseDTO();
             try
             {
-                var order = await _orderRepository.GetByExpression(o => o.Id == orderId, includeProperties: o=> o.Table.Restaurant);
+                var order = await _orderRepository.GetByExpression(o => o.Id == orderId, includeProperties: o => o.Table.Restaurant);
 
                 if (order == null)
                 {
@@ -173,7 +173,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     }).ToList()
                 };
 
-                foreach(var od in orderDetails)
+                foreach (var od in orderDetails)
                 {
                     var createOrderDetailHubReponse = new
                     {
@@ -187,8 +187,9 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         Price = od.Price,
                         Status = od.Status,
                     };
-                   await _orderHubContext.Clients.Group(restaurantId.ToString()).SendAsync("ReceiveNewOrder", createOrderDetailHubReponse);
-                }           
+                    await _orderHubContext.Clients.Group(restaurantId.ToString()).SendAsync("ReceiveNewOrder", createOrderDetailHubReponse);
+                    await _orderHubContext.Clients.Group("Order" + order.Id.ToString() ).SendAsync("ReceiveNewOrder", createOrderDetailHubReponse);
+                }
             }
             catch (Exception)
             {
@@ -206,23 +207,28 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
             {
                 OrderDetail? orderDetail = await _orderDetailRepositoy.GetByIdAsync(orderDetailId, includes: p => p.Order.Table.Restaurant);
 
-                if (orderDetail == null) {
+                if (orderDetail == null)
+                {
                     throw new Exception("not found order detail with orderDetaiId: " + orderDetailId);
                 }
 
-                if(orderDetail.Status == "pending")
+                var orderId = orderDetail.OrderId;
+
+                if (orderDetail.Status == "pending")
                 {
                     if (status == "confirmed" || status == "rejected")
                         orderDetail.Status = status;
                     else
                         throw new Exception("Status only can change from pending to confirmed or rejected");
-                } else  if (orderDetail.Status == "confirmed")
+                }
+                else if (orderDetail.Status == "confirmed")
                 {
                     if (status == "preparing" || status == "rejected")
                         orderDetail.Status = status;
                     else
                         throw new Exception("Status only can change from confirmed to preparing or rejected");
-                } else if (orderDetail.Status == "preparing")
+                }
+                else if (orderDetail.Status == "preparing")
                 {
                     if (status == "delivered" || status == "rejected")
                         orderDetail.Status = status;
@@ -242,6 +248,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 };
 
                 await _orderHubContext.Clients.Group(restaurantId.ToString()).SendAsync("UpdateOrderDetailStatus", updateOrderDetailStatus);
+                await _orderHubContext.Clients.Group("Order" + orderId.ToString()).SendAsync("UpdateOrderDetailStatus", updateOrderDetailStatus);
             }
             catch (Exception e)
             {
@@ -275,6 +282,31 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     DishName = item.Dish.Name,
                     DishImage = item.Dish.Image,
                     TableName = item.Order.Table.Name,
+                    Quantity = item.Quantity,
+                    Price = item.Price,
+                    Status = item.Status,
+
+                }).ToList();
+            return orderDetails;
+        }
+
+        public async Task<List<OrderDetailHubResponse>> GetCurrentDishesOfAOrder(int orderId)
+        {
+            var today = TimeZoneUtil.GetCurrentTime();
+            var querryData = await _unitOfWork.OrderDetails.GetAllDataByExpression(od =>
+                od.OrderId == orderId /*&& od.Order.CreatedAt == today*/ , null, null, includes: new Expression<Func<OrderDetail, object>>[]
+            {
+                od => od.Dish
+            });
+
+            var orderDetails = querryData.Items
+                .Select(item => new OrderDetailHubResponse
+                {
+                    Id = item.Id,
+                    OrderId = item.OrderId,
+                    DishId = item.DishId,
+                    DishName = item.Dish.Name,
+                    DishImage = item.Dish.Image,
                     Quantity = item.Quantity,
                     Price = item.Price,
                     Status = item.Status,

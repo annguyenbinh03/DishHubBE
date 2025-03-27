@@ -13,6 +13,5 @@ namespace Group6.NET1704.SW392.AIDiner.Common.DTO
         public decimal TotalAmount { get; set; }
         public bool PaymentStatus { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public string Status { get; set; } = null!;
     }
 }

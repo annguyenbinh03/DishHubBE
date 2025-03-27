@@ -30,11 +30,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IVnpayService, VnpayService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
-builder.Services.AddScoped<GeminiService>(provider =>
-{
-    string apiKey = builder.Configuration["Gemini:Key"];
-    return new GeminiService(apiKey);
-});
+builder.Services.AddScoped<GeminiService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddScoped<IAuthenService, AuthenService>();

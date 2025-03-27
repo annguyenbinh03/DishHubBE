@@ -12,7 +12,9 @@ public interface IUnitOfWork
 
     IGenericRepository<Table> Tables { get; }
     IGenericRepository<OrderDetail> OrderDetails { get; }
-
-    public Task<int> SaveChangeAsync();
     IGenericRepository<DishIngredient> DishIngredientRepository { get; }
+    public IGenericRepository<Payment> Payments { get; }
+    public IGenericRepository<Dish> Dishes { get; }
+    public Task<int> SaveChangeAsync();
+
 }

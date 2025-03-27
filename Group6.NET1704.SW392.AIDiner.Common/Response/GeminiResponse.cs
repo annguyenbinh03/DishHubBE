@@ -8,6 +8,7 @@ namespace Group6.NET1704.SW392.AIDiner.Common.Response
 {
     public class GeminiResponse
     {
+        public int OrderId { get; set; }
         public string Intent { get; set; } // Ý định của người dùng (ví dụ: "OrderFood", "GetMenu", "CheckOrderStatus")
         public Dictionary<string, string> Entities { get; set; } // Các thực thể (ví dụ: {"food": "pizza", "quantity": "1"})
         public string ResponseText { get; set; } // Thêm thuộc tính này

@@ -144,7 +144,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
 
                 amount /= 100;
 
-                if (vnp_ResponseCode == "00")
+                if (vnp_ResponseCode == "00") 
                 {
                     var payment = new Payment
                     {

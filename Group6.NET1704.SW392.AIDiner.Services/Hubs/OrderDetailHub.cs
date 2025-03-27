@@ -24,6 +24,18 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Hubs
             _orderDetailService = orderDetailService;
         }
 
+        public async Task JoinOrderGroup(int orderId)
+        {
+
+            Console.WriteLine("hehhee");
+
+        }
+
+        public async Task LeaveOrderGroup(int orderId)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Order" + orderId.ToString());
+        }
+
         public override async Task OnConnectedAsync()
         {
             var httpContext = Context.GetHttpContext();
@@ -37,6 +49,16 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Hubs
                     // Gửi danh sách đơn hàng hiện tại
                     var orders = await _orderDetailService.getRestaurantCurrentOrderDetail(parsedRestaurantId);
                     await Clients.Caller.SendAsync("LoadCurrentOrders", orders);
+                }
+            }
+            else if (httpContext.Request.Query.TryGetValue("orderId", out var orderId))
+            {
+                if (int.TryParse(orderId, out int parsedOrderId))
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, "Order" + parsedOrderId.ToString());
+
+                    var orderDetails = await _orderDetailService.GetCurrentDishesOfAOrder(parsedOrderId);
+                    await Clients.Caller.SendAsync("LoadCurrentDishes", orderDetails);
                 }
             }
             await base.OnConnectedAsync();

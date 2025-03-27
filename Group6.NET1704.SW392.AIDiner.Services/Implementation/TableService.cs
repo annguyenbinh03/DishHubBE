@@ -78,7 +78,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     Name = d.Name,
                     Description = d.Description,
                     CreatedAt = d.CreatedAt,
-                    IsDeleted = d.IsDeleted,
+                    Status = d.Status,
                     RestaurantId = d.RestaurantId,
                     RestaurantName = d.Restaurant != null ? d.Restaurant.Name : "Unknown",
                     RestaurantImage = d.Restaurant != null ? d.Restaurant.Image : ""
