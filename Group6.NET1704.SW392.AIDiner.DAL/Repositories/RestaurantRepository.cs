@@ -51,7 +51,8 @@ namespace Group6.NET1704.SW392.AIDiner.DAL.Repositories
                 Tables = r.Tables.Select(t => new RestaurantTables
                 {
                     Id = t.Id,
-                    Name = t.Name
+                    Name = t.Name,
+                    Status = t.Status
                 }).ToList()
             })
             .ToListAsync();

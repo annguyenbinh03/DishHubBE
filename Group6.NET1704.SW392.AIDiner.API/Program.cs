@@ -158,10 +158,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // 🔄 Chỉ cho phép React truy cập (chỉnh sửa lại từ AllowSpecificOrigins)
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials(); // ✅ Quan trọng nếu sử dụng cookie/token
+        policy.WithOrigins("http://localhost:3000",
+                      "https://dishhub-dxfrckc2cf3jgcH4.southeastasia-01.azurewebsites.net")
+         .AllowAnyMethod()
+         .AllowAnyHeader()
+         .AllowCredentials(); 
     });
 });
 
