@@ -350,10 +350,13 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 foreach (var table in tables.Items)
                 {
                     // Tìm order đầu tiên có trạng thái 'inProgress' cho bàn này
-                    var firstInProgressOrder = await _unitOfWork.Orders.GetByExpression(
-                        filter: o => o.TableId == table.Id && o.Status == "inProgress",
-                        includeProperties: o => o.OrderDetails
-                    );
+                    var firstInProgressOrder = (await _unitOfWork.Orders.GetAllDataByExpression(
+    filter: o => o.TableId == table.Id && o.Status == "inProgress",
+    pageNumber: null,
+    pageSize: null,
+    includes: o => o.OrderDetails // ✅ đúng cú pháp
+)).Items.FirstOrDefault();
+
 
                     object tableResponse; // Declare tableResponse outside if/else
 
