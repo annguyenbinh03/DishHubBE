@@ -13,6 +13,7 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Contract
         Task<ResponseDTO> GetPayments(int? restaurantId);
         Task<ResponseDTO> GetPaymentByRestaurantId(int? restaurantId);
         Task<ResponseDTO> PaidByCash(PaidByCashRequest request);
+        Task<ResponseDTO> GetPaymentInfoById(int paymentId);
 
     }
 

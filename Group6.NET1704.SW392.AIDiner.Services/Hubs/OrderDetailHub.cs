@@ -27,8 +27,6 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Hubs
         public async Task JoinOrderGroup(int orderId)
         {
 
-            Console.WriteLine("hehhee");
-
         }
 
         public async Task LeaveOrderGroup(int orderId)

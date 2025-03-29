@@ -3,8 +3,12 @@ using Group6.NET1704.SW392.AIDiner.Common.DTO.BusinessCode;
 using Group6.NET1704.SW392.AIDiner.DAL.Contract;
 using Group6.NET1704.SW392.AIDiner.DAL.Models;
 using Group6.NET1704.SW392.AIDiner.Services.BusinessObjects;
+using Group6.NET1704.SW392.AIDiner.Services.Enums;
+using Group6.NET1704.SW392.AIDiner.Services.Hubs;
 using Group6.NET1704.SW392.AIDiner.Services.Util;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Options;
 using System.Web;
 
@@ -16,13 +20,15 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
         private readonly IGenericRepository<Order> _orderRepository;
         private readonly IGenericRepository<Payment> _paymentRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHubContext<OrderDetailHub> _orderHub;
 
-        public VnpayService(IOptions<VNPaySettings> vnPaySettings, IGenericRepository<Order> orderRepository, IGenericRepository<Payment> paymentRepository, IUnitOfWork unitOfWork)
+        public VnpayService(IOptions<VNPaySettings> vnPaySettings, IGenericRepository<Order> orderRepository, IGenericRepository<Payment> paymentRepository, IUnitOfWork unitOfWork, IHubContext<OrderDetailHub> orderHub)
         {
             _vNPaySettings = vnPaySettings.Value;
             _orderRepository = orderRepository;
             _paymentRepository = paymentRepository;
             _unitOfWork = unitOfWork;
+            _orderHub = orderHub;
         }
 
         public async Task<ResponseDTO> Charge(int orderId, int methodId)
@@ -153,19 +159,23 @@ namespace Group6.NET1704.SW392.AIDiner.Services.PaymentGateWay
                         TransactionCode = vnpayTranId.ToString(),
                         CreatedAt = TimeZoneUtil.GetCurrentTime(),
                         Amount = amount,
-                        Description = $"Thanh toán thành công cho orderId {orderId}",
+                        Description = $"Thanh toán cho hóa đơn {orderId}",
                         Status = true,
                     };
 
-                    var order = await _orderRepository.GetById(orderId);
+                    var order = await _orderRepository.GetByIdAsync(orderId, includes: o => o.Table);
+                    Table table = order.Table;
 
                     await _paymentRepository.Insert(payment);
-                    order.Status = "completed";
+                    order.Status = OrderStatus.completed.ToString();
                     order.PaymentStatus = true;
+                    table.Status = TableStatus.available.ToString();
                     await _orderRepository.Update(order);
                     await _unitOfWork.SaveChangeAsync();
 
-                    string redirectURL = _vNPaySettings.RedirectUrl + $"/{payment.Id}";
+                    string redirectURL = _vNPaySettings.RedirectUrl;
+
+                    await _orderHub.Clients.Group("Order" + order.Id.ToString()).SendAsync("PaidComplete", payment.Id);
 
                     response.IsSucess = true;
                     response.BusinessCode = BusinessCode.CREATE_SUCCESS;

@@ -58,5 +58,12 @@ namespace Group6.NET1704.SW392.AIDiner.API.UserControllers
             return Ok(resultList);
         }
 
+        [HttpGet("pay/info/{paymentId}")]
+        public async Task<IActionResult> PaymentInfo(int paymentId)
+        {
+            var resultList = await _paymentService.GetPaymentInfoById(paymentId);
+            return Ok(resultList);
+        }
+
     }
 }

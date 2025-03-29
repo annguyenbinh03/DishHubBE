@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using Group6.NET1704.SW392.AIDiner.Common.Request;
 using Group6.NET1704.SW392.AIDiner.Services.Util;
 using Group6.NET1704.SW392.AIDiner.Services.Enums;
+using Microsoft.AspNetCore.SignalR;
+using Group6.NET1704.SW392.AIDiner.Services.Hubs;
 
 namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
 {
@@ -20,17 +22,20 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
         private readonly IGenericRepository<PaymentMethod> _paymentMethodRepository;
         private readonly IGenericRepository<Order> _orderRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHubContext<OrderDetailHub> _orderHub;
 
         public PaymentService(
             IGenericRepository<Payment> paymentRepository,
             IGenericRepository<PaymentMethod> paymentMethodRepository,
             IGenericRepository<Order> orderRepository,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IHubContext<OrderDetailHub> orderHub)
         {
             _paymentRepository = paymentRepository;
             _paymentMethodRepository = paymentMethodRepository;
             _orderRepository = orderRepository;
             _unitOfWork = unitOfWork;
+            _orderHub = orderHub;
         }
 
         public async Task<ResponseDTO> GetPayments(int? restaurantId)
@@ -125,14 +130,15 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                     TransactionCode = "",
                     CreatedAt = TimeZoneUtil.GetCurrentTime(),
                     Amount = order.TotalAmount,
-                    Description = request.description != null ? request.description : "thanh toán cho hóa đơn " + order.Id,
+                    Description = request.description != null ? request.description : "Thanh toán cho hóa đơn " + order.Id,
                     Status = true
                 };
-
+                
                 await _unitOfWork.Payments.Insert(newPayment);
 
                 // complete order , free talbe
                 order.Status = OrderStatus.completed.ToString();
+                order.PaymentStatus = true;
                 table.Status = TableStatus.available.ToString();
 
                 await _unitOfWork.SaveChangeAsync();
@@ -140,6 +146,52 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                 dto.IsSucess = true;
                 dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
                 dto.message = "Paid for order successfully";
+
+                await _orderHub.Clients.Group("Order" + request.orderId.ToString()).SendAsync("PaidComplete", newPayment.Id);
+            }
+            catch (Exception ex)
+            {
+                dto.IsSucess = false;
+                dto.BusinessCode = BusinessCode.EXCEPTION;
+                dto.Data = ex.Message;
+            }           
+            return dto;
+        }
+
+        public async Task<ResponseDTO> GetPaymentInfoById(int paymentId)
+        {
+            ResponseDTO dto = new ResponseDTO();
+            try
+            {
+                var payment = await _paymentRepository.GetByExpression(
+                    p => p.Id == paymentId,
+                    p => p.Method,
+                    p => p.Order.OrderDetails);
+
+                if (payment == null)
+                {
+                    dto.IsSucess = false;
+                    dto.BusinessCode = BusinessCode.NOT_FOUND;
+                    dto.message = "Payment not found";
+                    return dto;
+                }
+
+                dto.Data = new 
+                {
+                    Id = payment.Id,
+                    OrderId = payment.OrderId,
+                    MethodId = payment.Method.Name,
+                    MethodName = payment.Method?.Name ?? "Unknown",
+                    TransactionCode = payment.TransactionCode,
+                    CreatedAt = payment.CreatedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
+                    Amount = payment.Amount,
+                    Description = payment.Description,
+                    Status = payment.Status
+                };
+
+                dto.IsSucess = true;
+                dto.BusinessCode = BusinessCode.GET_DATA_SUCCESSFULLY;
+                dto.message = "Get payment successfully";
             }
             catch (Exception ex)
             {

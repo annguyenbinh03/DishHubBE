@@ -159,7 +159,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:3000",
-                      "https://dishhub-dxfrckc2cf3jgcH4.southeastasia-01.azurewebsites.net")
+                      "https://dishhub-dxfrckc2c3fjgch4.southeastasia-01.azurewebsites.net")
          .AllowAnyMethod()
          .AllowAnyHeader()
          .AllowCredentials(); 
@@ -175,6 +175,7 @@ app.UseCors("AllowFrontend");
 
 app.MapHub<OrderDetailHub>("/hub/order-details").RequireCors("AllowFrontend");
 app.MapHub<RequestHub>("/hub/requests").RequireCors("AllowFrontend");
+app.MapHub<OrderHub>("/hub/orders").RequireCors("AllowFrontend");
 
 // Cấu hình pipeline của ứng dụng
 //if (app.Environment.IsDevelopment())

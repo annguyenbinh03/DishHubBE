@@ -137,11 +137,14 @@ namespace Group6.NET1704.SW392.AIDiner.Services.Implementation
                         OrderId = orderId,
                         DishId = dish.DishId,
                         Quantity = dish.Quantity,
-                        Price = menuDish.Price * dish.Quantity,
+                        Price = menuDish.Price,
                         Status = "pending"
                     };
+
+                    menuDish.SoldCount++;
+
                     orderDetails.Add(orderDetail);
-                    totalAmount += orderDetail.Price;
+                    totalAmount += orderDetail.Price * orderDetail.Quantity;
                 }
 
                 if (orderDetails.Count > 0)
