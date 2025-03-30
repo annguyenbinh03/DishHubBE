@@ -175,7 +175,6 @@ app.UseCors("AllowFrontend");
 
 app.MapHub<OrderDetailHub>("/hub/order-details").RequireCors("AllowFrontend");
 app.MapHub<RequestHub>("/hub/requests").RequireCors("AllowFrontend");
-app.MapHub<OrderHub>("/hub/orders").RequireCors("AllowFrontend");
 
 // Cấu hình pipeline của ứng dụng
 //if (app.Environment.IsDevelopment())
